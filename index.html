@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tap Crypto</title>
+<title>Instant Tap Reward</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-
-<!-- Adexium + Gigapub Ads -->
 <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 <script type="text/javascript">
   let adexiumWidget;
@@ -25,57 +23,104 @@
 <script src="https://ad.gigapub.tech/script?id=4424"></script>
 
 <style>
-  body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden}
-  #top{position:fixed;top:0;left:0;right:0;background:#000;padding:15px;display:flex;justify-content:space-between;align-items:center;z-index:999;box-shadow:0 4px 20px rgba(0,255,255,0.2)}
-  #name{color:#0ff;font-weight:bold;font-size:18px}
-  #pointBox{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;padding:10px 25px;border-radius:30px;font-weight:bold;font-size:17px;box-shadow:0 0 25px #0ff}
-  #walletBtn{background:linear-gradient(135deg,#8a2be2,#ff00ff);color:white;padding:12px 28px;border-radius:30px;font-weight:bold;cursor:pointer;border:none;box-shadow:0 0 25px #8a2be2}
+  body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden;
+       background: radial-gradient(circle at center, #0a0028 0%, #000 80%)}
 
-  #energyBar{width:88%;max-width:380px;height:36px;background:#111;border-radius:18px;margin:20px auto;overflow:hidden;border:3px solid #00ffff;box-shadow:0 0 25px rgba(0,255,255,0.6)}
-  #energyFill{height:100%;background:linear-gradient(90deg,#00ffff,#8a2be2);transition:0.4s}
-  #energyText{text-align:center;font-weight:bold;color:#00ffff;font-size:19px;text-shadow:0 0 20px #00ffff;margin:10px 0}
+  #top{position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);padding:18px 20px;display:flex;
+       justify-content:space-between;align-items:center;z-index:999;backdrop-filter: blur(15px);
+       border-bottom:4px solid #0ff;box-shadow:0 0 50px #0ff}
 
-  #adBtn{background:linear-gradient(135deg,#8a2be2,#ff00ff);color:white;padding:22px 40px;border-radius:40px;
-    font-weight:bold;margin:40px auto;display:block;width:90%;max-width:400px;font-size:24px;
-    box-shadow:0 0 50px #8a2be2;cursor:pointer;border:none;animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 50px #8a2be2}50%{box-shadow:0 0 80px #ff00ff}}
+  #name{color:#0ff;font-weight:bold;font-size:22px;text-shadow:0 0 25px #0ff}
+  #pointBox{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;padding:16px 40px;
+            border-radius:60px;font-weight:bold;font-size:22px;box-shadow:0 0 80px #0ff;
+            border:5px solid #0ff}
+  #walletBtn{background:linear-gradient(135deg,#ff00ff,#8a2be2);color:white;padding:16px 40px;
+             border-radius:60px;font-weight:bold;cursor:pointer;border:5px solid #f0f;
+             box-shadow:0 0 80px #f0f;text-shadow:0 0 20px #fff;font-size:20px}
+
+  #energyBar{width:88%;max-width:420px;height:42px;background:#111;border-radius:22px;margin:30px auto;
+             overflow:hidden;border:5px solid #0ff;box-shadow:0 0 60px #0ff, inset 0 0 35px #0ff}
+  #energyFill{height:100%;background:linear-gradient(90deg,#ff00ff,#00ffff);transition:0.6s;
+               box-shadow:0 0 50px #0ff}
+  #energyText{text-align:center;font-weight:bold;color:#0ff;font-size:24px;text-shadow:0 0 30px #0ff;margin:18px 0}
+
+  #adBtn{background:linear-gradient(135deg,#ff00ff,#00ffff);color:#000;padding:28px 40px;border-radius:70px;
+         font-weight:bold;margin:60px auto;display:block;width:88%;max-width:460px;font-size:30px;
+         box-shadow:0 0 100px #f0f, 0 0 150px #0ff;border:6px solid #0ff;cursor:pointer;
+         animation:neonPulse 1.6s infinite}
+  @keyframes neonPulse{0%,100%{box-shadow:0 0 100px #f0f,0 0 150px #0ff}50%{box-shadow:0 0 140px #f0f,0 0 200px #0ff}}
 
   #startScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1000;
-    display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-  #startScreen h1{font-size:58px;background:linear-gradient(135deg,#00ffff,#8a2be2);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900}
-  #startScreen p{font-size:24px;color:#888;margin:40px 0}
-  #startBtn{background:linear-gradient(135deg,#8a2be2,#ff00ff);color:white;padding:22px 90px;border-radius:50px;
-    font-size:28px;font-weight:bold;border:none;box-shadow:0 0 50px #ff00ff;cursor:pointer}
+               display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  #startScreen h1{font-size:78px;background:linear-gradient(135deg,#00ffff,#ff00ff);
+                  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;
+                  text-shadow:0 0 70px #0ff, 0 0 140px #f0f}
+  #startScreen p{font-size:30px;color:#0ff;text-shadow:0 0 35px #0ff;margin:50px 0}
+  #startBtn{background:linear-gradient(135deg,#ff00ff,#00ffff);color:#000;padding:30px 120px;border-radius:80px;
+            font-size:36px;font-weight:bold;border:7px solid #0ff;box-shadow:0 0 100px #0ff, 0 0 160px #f0f;cursor:pointer}
 
-  .screen,.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999;display:none;overflow-y:auto;padding:70px 15px 20px;box-sizing:border-box}
-  .close{position:absolute;top:15px;right:15px;background:#111;width:50px;height:50px;border-radius:50%;border:2px solid #00ffff;color:#00ffff;font-size:30px;cursor:pointer;z-index:1000}
+  .screen{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999;
+          display:none;overflow-y:auto;padding:80px 20px 30px;box-sizing:border-box;
+          background: radial-gradient(circle at top, #0a0028 0%, #000 80%)}
+  .close{position:absolute;top:15px;right:15px;background:#111;width:65px;height:65px;border-radius:50%;
+         border:6px solid #0ff;color:#0ff;font-size:44px;cursor:pointer;z-index:1000;
+         box-shadow:0 0 70px #0ff}
 
-  .tab-container{display:flex;justify-content:center;gap:15px;margin:30px 0;flex-wrap:wrap}
-  .tab-btn{padding:14px 34px;background:#111;border:2px solid #333;border-radius:40px;font-weight:bold;color:#aaa;cursor:pointer;font-size:16px;transition:0.3s;box-shadow:0 0 20px rgba(0,255,255,0.2)}
-  .tab-btn.active{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;border:none;box-shadow:0 0 40px #0ff}
+  .tab-container{display:flex;justify-content:center;gap:25px;margin:40px 0 30px;flex-wrap:wrap}
+  .tab-btn{padding:18px 48px;background:#111;border:6px solid #0ff;border-radius:70px;font-weight:bold;
+           color:#0ff;cursor:pointer;font-size:20px;transition:0.4s;box-shadow:0 0 60px #0ff;
+           text-shadow:0 0 30px #0ff}
+  .tab-btn.active{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;border:none;
+                  box-shadow:0 0 100px #0ff, 0 0 160px #0ff}
 
-  .voucher-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
-  .voucher{background:#111;border-radius:28px;overflow:hidden;border:2px solid #222;text-align:center;box-shadow:0 10px 40px rgba(0,255,255,0.2);transition:0.3s}
-  .v-header{background:linear-gradient(135deg,#8a2be2,#00ffff);padding:18px;color:#000;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:12px}
-  .v-header img{height:34px;border-radius:50%}
-  .v-amount{font-size:56px;color:#00ffff;margin:15px 0;text-shadow:0 0 30px #00ffff;font-weight:900}
-  .progress{height:10px;background:#222;border-radius:5px;overflow:hidden;margin:10px 20px}
-  .progress-fill{height:100%;background:linear-gradient(90deg,#00ffff,#8a2be2)}
-  .progress-text{color:#0ff;font-size:15px;margin-bottom:12px;font-weight:bold}
+  /* Google Play Cards - Screenshot jaisa */
+  .voucher-grid{display:grid;grid-template-columns:1fr 1fr;gap:25px;padding:0 10px;justify-items:center}
+  .voucher{background:#111;border-radius:40px;overflow:hidden;border:6px solid #0ff;text-align:center;
+           box-shadow:0 25px 100px rgba(0,255,255,0.6), 0 0 120px #0ff;position:relative;transition:0.4s;
+           max-width:380px}
+  .voucher::before{content:"";position:absolute;top:0;left:0;right:0;height:100px;
+                    background:linear-gradient(135deg,#8a2be2,#00ffff);border-radius:40px 40px 0 0;
+                    box-shadow:0 0 80px #0ff}
+  .v-header{position:relative;padding:25px 15px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .v-header img{height:50px;border-radius:15px}
+  .v-header span{color:#fff;font-weight:bold;font-size:22px;text-shadow:0 0 25px #000}
+  .v-amount{font-size:110px !important;color:#0ff !important;margin:40px 0 15px !important;
+             text-shadow:0 0 80px #0ff, 0 0 140px #00ffff !important;font-weight:900 !important;
+             letter-spacing:4px}
+  .progress{height:16px;background:#000;border-radius:12px;overflow:hidden;margin:25px 40px;
+             border:4px solid #0ff;box-shadow:0 0 50px #0ff}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#ff00ff,#00ffff);box-shadow:0 0 50px #0ff}
+  .progress-text{color:#0ff;font-size:22px !important;margin-bottom:25px !important;
+                  font-weight:bold;text-shadow:0 0 30px #0ff}
+  .redeem-btn{background:#333;color:#888;padding:20px;border-radius:28px;width:80%;margin:0 auto 30px;
+              font-weight:bold;font-size:22px;cursor:not-allowed;border:4px solid #666}
+  .redeem-btn.active{background:linear-gradient(135deg,#00ff88,#00ffff);color:#000;cursor:pointer;
+                     box-shadow:0 0 90px #0f0;border:none}
 
-  /* Big & Beautiful TON Card */
-  #tonCard{background:linear-gradient(135deg,#8a2be2,#00ffff);border-radius:32px;overflow:hidden;
-    box-shadow:0 15px 60px rgba(0,255,255,0.5);padding:30px;margin:30px auto;max-width:400px;border:4px solid #00ffff}
-  #tonCard .amount{font-size:80px;color:#fff;text-shadow:0 0 40px #000;font-weight:900;margin:15px 0}
-  #tonCard input{width:100%;padding:20px;background:#000;border:3px solid #00ffff;border-radius:18px;color:#fff;font-size:18px;margin:20px 0;outline:none;letter-spacing:1px}
-  #tonWithdrawBtn{padding:20px;border-radius:20px;width:100%;font-weight:bold;font-size:22px;cursor:not-allowed;background:#333}
-  #tonWithdrawBtn.active{background:linear-gradient(135deg,#00ff88,#00ffff);color:#000;cursor:pointer;box-shadow:0 0 50px #0f0}
+  /* TON Card - Same style as Google Play */
+  #tonCard{background:#111;border-radius:40px;overflow:hidden;border:6px solid #0ff;text-align:center;
+           box-shadow:0 25px 100px rgba(0,255,255,0.6), 0 0 120px #0ff;position:relative;transition:0.4s;
+           max-width:380px;margin:30px auto}
+  #tonCard::before{content:"";position:absolute;top:0;left:0;right:0;height:100px;
+                    background:linear-gradient(135deg,#8a2be2,#00ffff);border-radius:40px 40px 0 0;
+                    box-shadow:0 0 80px #0ff}
+  #tonCard .v-header{position:relative;padding:25px 15px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px}
+  #tonCard .v-header img{height:50px}
+  #tonCard .v-header span{color:#fff;font-weight:bold;font-size:22px;text-shadow:0 0 25px #000}
+  #tonCard .amount{font-size:110px;color:#0ff;margin:40px 0 15px;
+                   text-shadow:0 0 80px #0ff, 0 0 140px #00ffff;font-weight:900;letter-spacing:4px}
+  #tonCard input{width:88%;padding:22px;background:#000;border:4px solid #0ff;border-radius:20px;
+                 color:#0ff;font-size:18px;margin:20px auto;display:block;outline:none}
+  #tonWithdrawBtn{padding:20px;border-radius:28px;width:80%;margin:0 auto 30px;
+                  font-weight:bold;font-size:22px;cursor:not-allowed;background:#333;border:4px solid #666}
+  #tonWithdrawBtn.active{background:linear-gradient(135deg,#00ff88,#00ffff);color:#000;cursor:pointer;
+                         box-shadow:0 0 90px #0f0;border:none}
 
-  .history-item{background:#111;padding:20px;margin:15px 0;border-radius:18px;border-left:6px solid #00ffff}
-  .history-item.success{border-left-color:#00ff88;background:#001a08}
-  .timer{font-size:20px;color:#ff00ff;font-weight:bold;margin-top:10px}
-  .success-text{color:#00ff88;font-weight:bold;font-size:20px}
+  .history-item{background:#111;padding:30px;margin:25px;border-radius:30px;border-left:12px solid #0ff;
+                box-shadow:0 0 60px rgba(0,255,255,0.5)}
+  .history-item.success{border-left-color:#0f0;background:#001a08;box-shadow:0 0 70px #0f0}
+  .timer{font-size:24px;color:#ff00ff;font-weight:bold;text-shadow:0 0 30px #f0f;margin-top:15px}
+  .success-text{color:#00ff88;font-weight:bold;font-size:24px;text-shadow:0 0 30px #0f0}
 </style>
 </head>
 <body>
@@ -87,17 +132,17 @@
 </div>
 
 <div id="startScreen">
-  <h1>Tap Crypto</h1>
-  <p>Watch Ads & Earn TON!</p>
+  <h1>Instant Tap Reward</h1>
+  <p>Watch Ads & Earn Rewards!</p>
   <button id="startBtn" onclick="startGame()">START NOW</button>
 </div>
 
-<div id="gameArea" style="display:none;text-align:center;padding-top:100px">
-  <div style="font-size:70px;margin-bottom:20px">Play Video</div>
-  <div style="font-size:26px;color:#0ff;margin:20px 0">Watch ads = +1 Point each</div>
+<div id="gameArea" style="display:none;text-align:center;padding-top:120px">
+  <div style="font-size:100px;margin-bottom:25px;text-shadow:0 0 80px #0ff">Play Video</div>
+  <div style="font-size:32px;color:#0ff;margin:35px 0;text-shadow:0 0 40px #0ff">Watch ads = +1 Point each</div>
   
   <div id="energyBar"><div id="energyFill"></div></div>
-  <div id="energyText">Daily Ads Watched: <span id="dailyCount">0</span>/320</div>
+  <div id="energyText">Daily Ads: <span id="dailyCount">0</span>/320</div>
   
   <button id="adBtn" onclick="watchAd()">Watch Ad = +1 Point</button>
 </div>
@@ -105,7 +150,9 @@
 <!-- Wallet Screen -->
 <div id="walletScreen" class="screen">
   <button class="close" onclick="closeScreen()">X</button>
-  <h2 style="text-align:center;color:#00ffff;margin:20px 0;font-size:34px">Points: <span id="wPoint">0</span></h2>
+  <h2 style="text-align:center;color:#0ff;margin:35px 0;font-size:46px;text-shadow:0 0 60px #0ff">
+    Points: <span id="wPoint">0</span>
+  </h2>
 
   <div class="tab-container">
     <button class="tab-btn" onclick="showTab('google')">Google Play</button>
@@ -117,26 +164,36 @@
     <div class="voucher-grid" id="vouchers"></div>
   </div>
 
-  <!-- Big TON Withdrawal Card -->
   <div id="tonTab">
     <div id="tonCard">
       <div class="v-header">
         <img src="https://ton.org/download/ton_symbol.png" alt="TON">
-        <span style="font-size:22px">TON Withdrawal</span>
+        <span>TON Withdrawal</span>
       </div>
       <div class="amount">$0.1</div>
       <div class="progress"><div class="progress-fill" id="tonProgress" style="width:0%"></div></div>
       <div class="progress-text"><span id="tonCurrent">0</span>/320 Points</div>
-      
       <input type="text" id="tonAddr" placeholder="Enter Your TON Address (UQ... or EQ...)">
-      
-      <button id="tonWithdrawBtn" onclick="withdrawTON()">Locked</button>
+      <button id="tonWithdraw" onclick="withdrawTON()">Locked</button>
     </div>
   </div>
 
   <div id="historyTab" style="display:none">
-    <h3 style="text-align:center;color:#00ffff;margin:25px 0;font-size:24px">Withdrawal History</h3>
+    <h3 style="text-align:center;color:#0ff;margin:40px 0;font-size:32px;text-shadow:0 0 40px #0ff">Withdrawal History</h3>
     <div id="historyList"><p style="text-align:center;color:#666">No history yet</p></div>
+  </div>
+</div>
+
+<!-- Redeem Modal for Google Play -->
+<div class="modal" id="redeemModal" style="display:none">
+  <div style="background:#111;padding:40px;border-radius:40px;width:90%;max-width:420px;margin:100px auto;
+              border:6px solid #0ff;box-shadow:0 0 100px #0ff">
+    <h2 style="color:#0ff;text-align:center;font-size:32px;text-shadow:0 0 40px #0ff">Redeem Gift Card</h2>
+    <input type="text" id="redeemName" placeholder="Your Full Name" style="width:100%;padding:20px;margin:20px 0;background:#000;border:4px solid #0ff;border-radius:20px;color:#0ff;font-size:18px">
+    <input type="text" id="redeemEmail" placeholder="Your Gmail Address" style="width:100%;padding:20px;margin:20px 0;background:#000;border:4px solid #0ff;border-radius:20px;color:#0ff;font-size:18px">
+    <button onclick="submitRedeem()" style="background:linear-gradient(135deg,#00ff88,#00ffff);color:#000;padding:20px;border-radius:20px;width:100%;font-weight:bold;font-size:22px;
+            box-shadow:0 0 70px #0f0;border:none;cursor:pointer">Submit Request</button>
+    <button onclick="closeModal()" style="background:#333;color:#888;padding:20px;border-radius:20px;width:100%;margin-top:15px;font-weight:bold;font-size:20px">Cancel</button>
   </div>
 </div>
 
@@ -163,9 +220,7 @@ const DAILY_LIMIT = 320;
 
 const today = new Date().toISOString().split('T')[0];
 if (localStorage.getItem(DATE_KEY) !== today) {
-  todayAds = 0;
-  localStorage.setItem(DAILY_KEY, "0");
-  localStorage.setItem(DATE_KEY, today);
+  todayAds = 0; localStorage.setItem(DAILY_KEY, "0"); localStorage.setItem(DATE_KEY, today);
 } else {
   todayAds = parseInt(localStorage.getItem(DAILY_KEY)) || 0;
 }
@@ -176,24 +231,16 @@ const vouchers = [
 ];
 
 async function watchAd() {
-  if (todayAds >= DAILY_LIMIT) {
-    Telegram.WebApp.showAlert("Daily limit reached! Come back tomorrow (320/320)");
-    return;
-  }
-  const btn = document.getElementById("adBtn");
-  btn.disabled = true; btn.textContent = "Loading Ad...";
+  if (todayAds >= DAILY_LIMIT) { Telegram.WebApp.showAlert("Daily limit reached! Come back tomorrow"); return; }
+  const btn = document.getElementById("adBtn"); btn.disabled = true; btn.textContent = "Loading Ad...";
   try {
     await window.showGiga();
     points += 1; todayAds += 1;
-    localStorage.setItem(POINT_KEY, points);
-    localStorage.setItem(DAILY_KEY, todayAds);
+    localStorage.setItem(POINT_KEY, points); localStorage.setItem(DAILY_KEY, todayAds);
     Telegram.WebApp.HapticFeedback.notificationOccurred("success");
     update();
-  } catch (e) {
-    Telegram.WebApp.showAlert("Ad skipped or failed. Try again!");
-  } finally {
-    btn.disabled = false; btn.textContent = "Watch Ad = +1 Point";
-  }
+  } catch (e) { Telegram.WebApp.showAlert("Ad skipped. Try again!"); }
+  finally { btn.disabled = false; btn.textContent = "Watch Ad = +1 Point"; }
 }
 
 function update() {
@@ -207,15 +254,12 @@ function update() {
   document.getElementById("tonCurrent").innerText = points;
   const btn = document.getElementById("tonWithdrawBtn");
   if (points >= 320) {
-    btn.classList.add("active");
-    btn.textContent = "Withdraw $0.1 TON";
+    btn.classList.add("active"); btn.textContent = "Withdraw $0.1 TON";
   } else {
-    btn.classList.remove("active");
-    btn.textContent = "Locked";
+    btn.classList.remove("active"); btn.textContent = "Locked";
   }
 
-  loadVouchers();
-  updateHistory();
+  loadVouchers(); updateHistory();
 }
 
 function loadVouchers() {
@@ -224,20 +268,48 @@ function loadVouchers() {
     const p = Math.min((points / v.points)*100, 100);
     const ok = points >= v.points;
     html += `<div class="voucher">
-      <div class="v-header"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/1024px-Google_Play_Store_badge_EN.svg.png"><span>₹${v.inr} Gift Card</span></div>
+      <div class="v-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/1024px-Google_Play_Store_badge_EN.svg.png" alt="Play">
+        <span>₹${v.inr} Gift Card</span>
+      </div>
       <div class="v-amount">₹${v.inr}</div>
       <div class="progress"><div class="progress-fill" style="width:${p}%"></div></div>
       <div class="progress-text">${points}/${v.points} pts</div>
-      <button class="redeem-btn ${ok?'active':''}" ${ok?`onclick="openRedeem(${v.inr})"`:''}>${ok?'Redeem Now':'Locked'}</button>
+      <button class="redeem-btn ${ok?'active':''}" ${ok?`onclick="openRedeem(${v.inr})"`:''}>
+        ${ok?'Redeem Now':'Locked'}
+      </button>
     </div>`;
   });
   document.getElementById("vouchers").innerHTML = html;
+}
+
+function openRedeem(inr) { selectedINR = inr; document.getElementById("redeemModal").style.display = "flex"; }
+function closeModal() { document.getElementById("redeemModal").style.display = "none"; }
+
+function submitRedeem() {
+  const name = document.getElementById("redeemName").value.trim();
+  const email = document.getElementById("redeemEmail").value.trim();
+  if (!name || !email.includes("@gmail.com")) return Telegram.WebApp.showAlert("Enter valid Name & Gmail!");
+  const cost = selectedINR === 10 ? 320 : selectedINR === 20 ? 640 : selectedINR === 50 ? 1600 : 3200;
+  if (points < cost) return Telegram.WebApp.showAlert("Not enough points!");
+  points -= cost; localStorage.setItem(POINT_KEY, points);
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({chat_id:CHANNEL_ID,text:`NEW ₹${selectedINR} GOOGLE PLAY\nUser: ${userName} (${userId})\nName: ${name}\nEmail: ${email}`,parse_mode:"HTML"})});
+  addToHistory(`Google Play ₹${selectedINR}`, `${name} | ${email}`);
+  closeModal(); Telegram.WebApp.showAlert("Request sent! Code in 7 days"); update();
 }
 
 function addToHistory(type, details) {
   let h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
   h.unshift({type, details, time: Date.now(), status: "pending"});
   localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+}
+
+function formatCountdown(seconds) {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  return `${days}d ${hours}h ${mins}m left`;
 }
 
 function updateHistory() {
@@ -247,11 +319,12 @@ function updateHistory() {
   let html = "";
   h.forEach(item => {
     const elapsed = now - item.time;
+    const remaining = Math.max(0, sevenDays - elapsed);
     const t = new Date(item.time).toLocaleString();
     if (elapsed >= sevenDays) {
-      html += `<div class="history-item success"><b>${item.type}</b><br>${item.details}<br><small>${t}</small><br><div class="success-text">Success</div></div>`;
+      html += `<div class="history-item success"><b>${item.type}</b><br>${item.details}<br><small>${t}</small><br><div class="success-text">Completed</div></div>`;
     } else {
-      html += `<div class="history-item"><b>${item.type}</b><br>${item.details}<br><small>${t}</small><br><div class="timer">Processing... (up to 7 days)</div></div>`;
+      html += `<div class="history-item"><b>${item.type}</b><br>${item.details}<br><small>${t}</small><br><div class="timer">${formatCountdown(remaining / 1000)}</div></div>`;
     }
   });
   document.getElementById("historyList").innerHTML = html || "<p style='text-align:center;color:#666'>No history yet</p>";
@@ -261,8 +334,7 @@ function withdrawTON() {
   if (points < 320) return Telegram.WebApp.showAlert("You need 320 points!");
   const addr = document.getElementById("tonAddr").value.trim();
   if (!addr || (!addr.startsWith("UQ") && !addr.startsWith("EQ"))) return Telegram.WebApp.showAlert("Enter valid TON address!");
-  points -= 320;
-  localStorage.setItem(POINT_KEY, points);
+  points -= 320; localStorage.setItem(POINT_KEY, points);
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({chat_id:CHANNEL_ID,text:`NEW $0.1 TON REQUEST\nUser: ${userName} (${userId})\nAddress: <code>${addr}</code>`,parse_mode:"HTML"})});
   addToHistory("TON $0.1", addr);
@@ -274,7 +346,6 @@ function withdrawTON() {
 function startGame() { document.getElementById("startScreen").style.display="none"; document.getElementById("gameArea").style.display="block"; update(); }
 function openWallet() { closeScreen(); document.getElementById("walletScreen").style.display="block"; update(); }
 function closeScreen() { document.querySelectorAll(".screen,.modal").forEach(el=>el.style.display="none"); }
-function openRedeem(inr) { selectedINR = inr; Telegram.WebApp.showAlert("Google Play feature coming soon!"); }
 
 function showTab(tab) {
   document.getElementById("googleTab").style.display = tab==="google"?"block":"none";
@@ -284,7 +355,7 @@ function showTab(tab) {
   event.target.classList.add("active");
 }
 
-setInterval(updateHistory, 5000);
+setInterval(updateHistory, 60000); // Update countdown every minute
 update();
 </script>
 </body>
