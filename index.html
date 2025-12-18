@@ -6,8 +6,11 @@
 <title>Tap2Rich</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- AdExtra Full-Screen Ad Script -->
+<!-- AdExtra Full-Screen Interstitial Ad Script -->
 <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
+
+<!-- AdExtra Banner Ad Script -->
+<script async src="https://partner.adextra.io/jt/8dfd5ab2c4e61f2da6e19479327532b5d32ee7d9.js"></script>
 
 <style>
   body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden}
@@ -38,8 +41,10 @@
   #energyFill{height:100%;background:linear-gradient(90deg,#00ffff,#8a2be2);transition:0.4s}
   #energyText{text-align:center;font-weight:bold;color:#00ffff;font-size:19px;text-shadow:0 0 20px #00ffff}
 
+  #bannerAdContainer{width:88%;max-width:380px;margin:15px auto;display:flex;justify-content:center;align-items:center;overflow:hidden;border-radius:16px;}
+
   #adBtn{background:linear-gradient(135deg,#8a2be2,#ff00ff);color:white;padding:18px 40px;border-radius:35px;
-    font-weight:bold;margin:30px auto;display:block;width:88%;max-width:380px;font-size:20px;
+    font-weight:bold;margin:20px auto 40px;display:block;width:88%;max-width:380px;font-size:20px;
     box-shadow:0 0 35px #8a2be2;cursor:pointer;border:none}
 
   #startScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1000;
@@ -101,33 +106,33 @@
   </div>
   <div id="float"></div>
   
-  <!-- AdExtra Container Div -->
+  <!-- Full-Screen Interstitial Container -->
   <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
   
   <div id="energyBar"><div id="energyFill"></div></div>
   <div id="energyText">Energy: <span id="energyNow">10</span>/10<br>
     <small style="color:#888">Daily: <span id="dailyCount">0</span>/3200</small>
   </div>
+  
+  <!-- Banner Ad Container -->
+  <div id="bannerAdContainer">
+    <div id="8dfd5ab2c4e61f2da6e19479327532b5d32ee7d9"></div>
+  </div>
+  
   <button id="adBtn" onclick="watchAd()">Watch Ad & Recharge Energy</button>
 </div>
 
-<!-- Wallet Screen -->
+<!-- Wallet Screen - Amazon Removed -->
 <div id="walletScreen" class="screen">
   <button class="close" onclick="closeScreen()">X</button>
   <h2 style="text-align:center;color:#00ffff;margin:30px 0">Your Points: <span id="wPoint">0</span></h2>
   
   <div class="tab-container">
-    <button class="tab-btn active" onclick="showTab('amazon')">Amazon Gift Card</button>
-    <button class="tab-btn" onclick="showTab('google')">Google Play</button>
+    <button class="tab-btn active" onclick="showTab('google')">Google Play Gift Card</button>
     <button class="tab-btn" onclick="showTab('history')">History</button>
   </div>
 
-  <div id="amazonTab">
-    <h3 style="text-align:center;color:#0ff;margin:20px 0">Redeem Amazon e-Gift Card</h3>
-    <div class="voucher-grid" id="amazonVouchers"></div>
-  </div>
-
-  <div id="googleTab" style="display:none">
+  <div id="googleTab">
     <h3 style="text-align:center;color:#0ff;margin:20px 0">Redeem Google Play Gift Card</h3>
     <div class="voucher-grid" id="googleVouchers"></div>
   </div>
@@ -176,19 +181,11 @@ let points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
 let energy = 10;
 let todayTaps = 0;
 let selectedAmount = 0;
-let selectedType = "amazon";
+let selectedType = "google"; // Default Google Play
 const DAILY_LIMIT = 3200;
 
-// AdExtra Cooldown Logic
 let lastAdShowTime = 0;
-const ADEEXTRA_COOLDOWN = 10000; // 10 seconds in milliseconds
-
-const amazonVouchers = [
-  {inr:1, points:200},
-  {inr:5, points:1000},
-  {inr:10, points:2000},
-  {inr:20, points:4000}
-];
+const ADEEXTRA_COOLDOWN = 10000; // 10 seconds
 
 const googleVouchers = [
   {inr:10, points:2000},
@@ -224,32 +221,13 @@ function update() {
 }
 
 function loadVouchers() {
-  let amazonHtml = "";
-  amazonVouchers.forEach(v => {
-    const progress = Math.min((points / v.points)*100, 100);
-    const unlocked = points >= v.points;
-    amazonHtml += `<div class="voucher">
-      <div class="v-header">
-        <img src="https://1000logos.net/wp-content/uploads/2016/10/Amazon-Logo.png" alt="Amazon" style="height:32px">
-        <span>₹${v.inr} Gift Card</span>
-      </div>
-      <div class="v-amount">₹${v.inr}</div>
-      <div class="progress"><div class="progress-fill" style="width:${progress}%"></div></div>
-      <div class="progress-text">${points.toLocaleString()}/${v.points.toLocaleString()} pts</div>
-      <button class="redeem-btn ${unlocked?'active':''}" ${unlocked?`onclick="openRedeem(${v.inr}, 'amazon')"`:''}>
-        ${unlocked?'Redeem Now':'Locked'}
-      </button>
-    </div>`;
-  });
-  document.getElementById("amazonVouchers").innerHTML = amazonHtml;
-
   let googleHtml = "";
   googleVouchers.forEach(v => {
     const progress = Math.min((points / v.points)*100, 100);
     const unlocked = points >= v.points;
     googleHtml += `<div class="voucher">
       <div class="v-header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/1024px-Google_Play_Store_badge_EN.svg.png" alt="Google Play">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/1024px-Google_Play_Store_badge_EN.svg.png" alt="Google Play" style="height:32px">
         <span>₹${v.inr} Gift Card</span>
       </div>
       <div class="v-amount">₹${v.inr}</div>
@@ -270,7 +248,7 @@ function loadHistory() {
   } else {
     withdrawHistory.slice().reverse().forEach(item => {
       html += `<div class="history-item success">
-        <div><strong>₹${item.amount} ${item.type === 'amazon' ? 'Amazon' : 'Google Play'} Gift Card</strong></div>
+        <div><strong>₹${item.amount} Google Play Gift Card</strong></div>
         <div style="color:#888;font-size:14px">Date: ${item.date}</div>
         <div class="success-text">Processing (12-24 hours)</div>
       </div>`;
@@ -329,17 +307,10 @@ function submitRedeem() {
   if (!canWithdraw()) return;
 
   let cost = 0;
-  if (selectedType === "amazon") {
-    if (selectedAmount === 1) cost = 200;
-    else if (selectedAmount === 5) cost = 1000;
-    else if (selectedAmount === 10) cost = 2000;
-    else if (selectedAmount === 20) cost = 4000;
-  } else {
-    if (selectedAmount === 10) cost = 2000;
-    else if (selectedAmount === 20) cost = 4000;
-    else if (selectedAmount === 50) cost = 10000;
-    else if (selectedAmount === 100) cost = 20000;
-  }
+  if (selectedAmount === 10) cost = 2000;
+  else if (selectedAmount === 20) cost = 4000;
+  else if (selectedAmount === 50) cost = 10000;
+  else if (selectedAmount === 100) cost = 20000;
 
   if (points < cost) return Telegram.WebApp.showAlert("Points kam hain!");
 
@@ -355,24 +326,23 @@ function submitRedeem() {
   localStorage.setItem(LAST_WITHDRAW_KEY, now.toString());
 
   withdrawHistory.push({
-    type: selectedType,
+    type: "google",
     amount: selectedAmount,
     date: new Date().toLocaleString()
   });
   localStorage.setItem(HISTORY_KEY, JSON.stringify(withdrawHistory));
 
-  const typeText = selectedType === "amazon" ? "AMAZON E-GIFT CARD" : "GOOGLE PLAY CODE";
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
       chat_id: CHANNEL_ID,
-      text: `NEW ₹${selectedAmount} ${typeText}\nUser: ${userName} (${userId})\nName: ${name}\nEmail: ${email}`,
+      text: `NEW ₹${selectedAmount} GOOGLE PLAY CODE\nUser: ${userName} (${userId})\nName: ${name}\nEmail: ${email}`,
       parse_mode: "HTML"
     })
   });
 
-  Telegram.WebApp.showAlert(`₹${selectedAmount} ${selectedType === 'amazon' ? 'Amazon' : 'Google Play'} request successful!\n12-24 hours mein code milega`);
+  Telegram.WebApp.showAlert(`₹${selectedAmount} Google Play request successful!\n12-24 hours mein code milega`);
   closeModal();
   update();
 }
@@ -394,19 +364,16 @@ function tap(e) {
   update();
 }
 
-// Main Ad Function with 10-second cooldown
 function watchAd() {
   const btn = document.getElementById("adBtn");
   const now = Date.now();
 
-  // Cooldown check
   if (now - lastAdShowTime < ADEEXTRA_COOLDOWN) {
     const remaining = Math.ceil((ADEEXTRA_COOLDOWN - (now - lastAdShowTime)) / 1000);
     Telegram.WebApp.showAlert(`Please wait ${remaining} seconds before watching another ad!`);
     return;
   }
 
-  // Check if AdExtra script loaded
   if (typeof p_adextra !== 'function') {
     Telegram.WebApp.showAlert("Ad loading issue hai, page refresh karo!");
     return;
@@ -417,19 +384,16 @@ function watchAd() {
 
   p_adextra(
     function onSuccess() {
-      console.log("AdExtra ad successfully shown");
       energy = 10;
-      lastAdShowTime = Date.now(); // Start cooldown only on success
+      lastAdShowTime = Date.now();
       update();
       Telegram.WebApp.showAlert("Ad dekh liya! Energy full ho gayi!");
     },
     function onError() {
-      console.log("AdExtra ad failed or skipped");
       Telegram.WebApp.showAlert("Ad available nahi tha ya skip ho gaya. Thodi der baad try karo");
     }
   );
 
-  // Re-enable button after attempt
   setTimeout(() => {
     btn.disabled = false;
     btn.textContent = "Watch Ad & Recharge Energy";
@@ -445,7 +409,7 @@ function startGame() {
 function openWallet() { 
   closeScreen(); 
   document.getElementById("walletScreen").style.display="block"; 
-  showTab('amazon');
+  showTab('google');
   update(); 
 }
 
@@ -460,12 +424,11 @@ function closeModal() {
 function openRedeem(inr, type) { 
   selectedAmount = inr;
   selectedType = type;
-  document.getElementById("modalTitle").innerText = `Redeem ₹${inr} ${type === 'amazon' ? 'Amazon' : 'Google Play'} Gift Card`;
+  document.getElementById("modalTitle").innerText = `Redeem ₹${inr} Google Play Gift Card`;
   document.getElementById("redeemModal").style.display="flex"; 
 }
 
 function showTab(tab) {
-  document.getElementById("amazonTab").style.display = tab === 'amazon' ? 'block' : 'none';
   document.getElementById("googleTab").style.display = tab === 'google' ? 'block' : 'none';
   document.getElementById("historyTab").style.display = tab === 'history' ? 'block' : 'none';
 
