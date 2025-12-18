@@ -8,31 +8,161 @@
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-  body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden}
-  #top{position:fixed;top:0;left:0;right:0;background:#000;padding:15px;display:flex;justify-content:space-between;align-items:center;z-index:999;box-shadow:0 4px 20px rgba(0,255,255,0.2)}
-  #name{color:#0ff;font-weight:bold;font-size:18px}
-  #pointBox{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;padding:10px 25px;border-radius:30px;font-weight:bold;font-size:17px;box-shadow:0 0 25px #0ff}
+  body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden;position:relative}
+  
+  /* Background Glow Effect */
+  body::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulse 8s infinite;
+  }
+  @keyframes pulse { 0%,100% {opacity:0.4} 50% {opacity:0.8} }
 
-  #spinArea{width:320px;height:320px;margin:100px auto 30px;position:relative;
-    background:radial-gradient(circle,#00e0ff,#0066ff,#000);
-    border-radius:50%;cursor:pointer;overflow:hidden;
-    box-shadow:0 0 80px #00ffff,0 0 140px #8a2be2;
-    border:10px solid #00ffff;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    animation:glow 3s infinite alternate}
-  @keyframes glow{from{box-shadow:0 0 80px #00ffff,0 0 140px #8a2be2}to{box-shadow:0 0 110px #00ffff,0 0 200px #8a2be2}}
+  #top{position:fixed;top:0;left:0;right:0;background:#000;padding:15px;display:flex;justify-content:space-between;align-items:center;z-index:999;
+    box-shadow:0 4px 30px rgba(0,255,255,0.3)}
+  #name{color:#0ff;font-weight:bold;font-size:19px;text-shadow:0 0 15px #0ff}
+  #pointBox{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;padding:12px 30px;border-radius:30px;
+    font-weight:bold;font-size:18px;box-shadow:0 0 30px #0ff}
 
-  .spin-text{color:#fff;font-size:48px;font-weight:900;letter-spacing:3px;text-shadow:0 0 30px #00ffff}
-  .sub-text{color:#fff;font-size:28px;font-weight:900;margin-top:-10px;text-shadow:0 0 25px #8a2be2}
+  .wheel-container {
+    width: 340px;
+    height: 340px;
+    margin: 100px auto 70px;
+    position: relative;
+    filter: drop-shadow(0 0 60px rgba(0,255,255,0.6));
+  }
 
-  #timerText{font-size:32px;color:#ff00ff;font-weight:bold;margin-top:20px;text-align:center;display:none}
+  #wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+      #ff00ff 0% 12.5%, #ff33ff 12.5% 25%,
+      #8a2be2 25% 37.5%, #9933ff 37.5% 50%,
+      #00ffff 50% 62.5%, #00ccff 62.5% 75%,
+      #0066ff 75% 87.5%, #3399ff 87.5% 100%
+    );
+    box-shadow: 
+      0 0 80px #00ffff,
+      0 0 140px #8a2be2,
+      inset 0 0 80px rgba(0,0,0,0.6);
+    border: 14px solid #00ffff;
+    position: relative;
+    transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  }
 
-  #pointsDisplay{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:24px;color:#00ffff;font-weight:bold}
+  /* Center Circle with +1 Point */
+  .center-circle {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, #000 0%, #111 70%);
+    border-radius: 50%;
+    border: 8px solid #00ffff;
+    box-shadow: 
+      0 0 50px #00ffff,
+      inset 0 0 40px rgba(0,255,255,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
 
-  .plus{position:absolute;font-size:60px;color:#00ffff;font-weight:900;pointer-events:none;
-    animation:fly 1.2s forwards;text-shadow:0 0 25px #8a2be2}
-  @keyframes fly{to{transform:translateY(-250px) scale(0.3);opacity:0}}
+  .reward-text {
+    font-size: 48px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00ffff, #8a2be2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px #00ffff;
+    line-height: 1;
+  }
 
-  #float{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+  .reward-sub {
+    font-size: 20px;
+    color: #00ffff;
+    margin-top: -5px;
+    text-shadow: 0 0 20px #8a2be2;
+  }
+
+  /* Spin Button */
+  #spinButton {
+    position: absolute;
+    bottom: -35px; left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff00ff, #8a2be2);
+    color: white;
+    padding: 20px 70px;
+    border-radius: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 0 50px #ff00ff;
+    cursor: pointer;
+    z-index: 4;
+    min-width: 220px;
+    transition: all 0.3s;
+  }
+
+  #spinButton:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  #spinButton.disabled {
+    background: #333;
+    color: #888;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* Arrow Pointer */
+  .arrow {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #ff00ff;
+    filter: drop-shadow(0 10px 20px #ff00ff);
+    z-index: 10;
+  }
+
+  .arrow::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -20px;
+    width: 40px; height: 40px;
+    background: #ff00ff;
+    border-radius: 50%;
+    box-shadow: 0 0 30px #ff00ff;
+  }
+
+  /* +1 Flying Animation */
+  .plus {
+    position: absolute;
+    font-size: 70px;
+    font-weight: 900;
+    color: #00ffff;
+    pointer-events: none;
+    animation: flyUp 1.8s forwards;
+    text-shadow: 0 0 40px #8a2be2;
+    z-index: 5;
+  }
+
+  @keyframes flyUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-350px) scale(0.4); opacity: 0; }
+  }
 </style>
 </head>
 <body>
@@ -42,12 +172,15 @@
   <div id="pointBox">Points: <span id="point">0</span></div>
 </div>
 
-<div id="spinArea" onclick="spin()">
-  <div class="spin-text">SPIN TO</div>
-  <div class="sub-text">EARN</div>
-  <div id="timerText">Next in: 10s</div>
-  <div id="pointsDisplay">Total Points: <span id="totalPoints">0</span></div>
-  <div id="float"></div>
+<div class="wheel-container">
+  <div class="arrow"></div>
+  <div id="wheel">
+    <div class="center-circle">
+      <div class="reward-text">+1</div>
+      <div class="reward-sub">POINT</div>
+    </div>
+  </div>
+  <button id="spinButton" onclick="startSpin()">SPIN NOW</button>
 </div>
 
 <script>
@@ -58,8 +191,8 @@ let AdController = null;
 window.addEventListener("load", () => {
   if (window.Adsgram) {
     AdController = window.Adsgram.init({
-      blockId: "19122",  // <-- अपना AdsGram Block ID यहाँ डालें
-      debug: false     // production में false रखें
+      blockId: "19122",  // अपना AdsGram Block ID डालो
+      debug: false
     });
   }
 });
@@ -72,78 +205,90 @@ document.getElementById("name").textContent = userName;
 const POINT_KEY = "points_"+userId;
 
 let points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
-let isCooldown = false;
-let cooldownTime = 0;
+let isSpinning = false;
+const spinButton = document.getElementById("spinButton");
 
 function updatePoints() {
   points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
   document.getElementById("point").innerText = points.toLocaleString();
-  document.getElementById("totalPoints").innerText = points.toLocaleString();
 }
 
 function startCooldown() {
-  isCooldown = true;
-  cooldownTime = 10; // 10 seconds
-  document.getElementById("timerText").style.display = "block";
-  document.getElementById("timerText").innerText = `Next in: ${cooldownTime}s`;
+  let timeLeft = 10;
+  spinButton.disabled = true;
+  spinButton.classList.add("disabled");
+  spinButton.textContent = timeLeft;
 
-  const timerInterval = setInterval(() => {
-    cooldownTime--;
-    if (cooldownTime <= 0) {
-      clearInterval(timerInterval);
-      isCooldown = false;
-      document.getElementById("timerText").style.display = "none";
+  const timer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      spinButton.textContent = "SPIN NOW";
+      spinButton.disabled = false;
+      spinButton.classList.remove("disabled");
     } else {
-      document.getElementById("timerText").innerText = `Next in: ${cooldownTime}s`;
+      spinButton.textContent = timeLeft;
     }
   }, 1000);
 }
 
-function showPlusOne(e) {
-  const p = document.createElement("div");
-  p.className = "plus";
-  p.innerText = "+1";
-  p.style.left = (e.clientX || e.touches[0].clientX) + "px";
-  p.style.top = (e.clientY || e.touches[0].clientY) + "px";
-  document.getElementById("float").appendChild(p);
-  setTimeout(() => p.remove(), 1200);
+function showPlusOne() {
+  const plus = document.createElement("div");
+  plus.className = "plus";
+  plus.innerText = "+1";
+  plus.style.left = "50%";
+  plus.style.top = "50%";
+  plus.style.transform = "translate(-50%, -50%)";
+  document.querySelector(".wheel-container").appendChild(plus);
+  setTimeout(() => plus.remove(), 1800);
 }
 
-function spin(e) {
-  if (isCooldown) {
+function spinWheel() {
+  if (isSpinning) return;
+  isSpinning = true;
+
+  const wheel = document.getElementById("wheel");
+  const extraSpins = 6 + Math.random() * 4; // लंबा और मजेदार स्पिन
+  const randomDegree = Math.floor(Math.random() * 360);
+  const totalRotation = extraSpins * 360 + randomDegree;
+
+  wheel.style.transform = `rotate(${totalRotation}deg)`;
+
+  setTimeout(() => {
+    isSpinning = false;
+  }, 4500);
+}
+
+function startSpin() {
+  if (spinButton.disabled || isSpinning) {
     Telegram.WebApp.HapticFeedback.notificationOccurred("error");
-    Telegram.WebApp.showAlert("Timer chal raha hai, thoda wait karo!");
     return;
   }
 
   if (!AdController) {
-    Telegram.WebApp.showAlert("Ad network load nahi hua. Page refresh karo.");
+    Telegram.WebApp.showAlert("Ad load नहीं हुआ। Page refresh करो।");
     return;
   }
 
-  // स्पिन एनिमेशन शुरू (बटन rotate)
-  const spinArea = document.getElementById("spinArea");
-  spinArea.style.transition = "transform 0.5s ease-out";
-  spinArea.style.transform = "rotate(360deg)";
-  setTimeout(() => { spinArea.style.transform = "rotate(0deg)"; }, 500);
-
-  Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+  spinButton.textContent = "Loading Ad...";
+  spinButton.disabled = true;
 
   AdController.show()
-    .then((result) => {
-      // Ad पूरा देखा गया (rewarded)
+    .then(() => {
       points++;
       localStorage.setItem(POINT_KEY, points);
       updatePoints();
-      showPlusOne(e);
+      showPlusOne();
+      spinWheel();
       Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-      Telegram.WebApp.showAlert("Badhai ho! +1 Point mila!");
+      Telegram.WebApp.showAlert("शाबाश! +1 Point मिल गया 🎉");
+
       startCooldown();
     })
-    .catch((error) => {
-      // Ad skip/error
-      Telegram.WebApp.HapticFeedback.notificationOccurred("error");
-      Telegram.WebApp.showAlert("Ad nahi dekha ya error aaya. Point nahi mila.");
+    .catch(() => {
+      Telegram.WebApp.showAlert("Ad skip या error हुआ। Point नहीं मिला 😔");
+      spinButton.textContent = "SPIN NOW";
+      spinButton.disabled = false;
     });
 }
 
