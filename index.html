@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="format-detection" content="telephone=no">
 <title>Spin & Earn</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -24,14 +23,13 @@
     width: 100%;
     overflow: hidden;
     background: #000;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #fff;
     position: relative;
     -webkit-user-select: none;
     user-select: none;
   }
 
-  /* Background Glow Effect – Mobile optimized */
   body::before {
     content: '';
     position: fixed;
@@ -76,7 +74,7 @@
   .wheel-container {
     width: min(85vw, 340px);
     height: min(85vw, 340px);
-    margin: 20vh auto 15vh;
+    margin: 18vh auto 25vh; /* Extra space at bottom for button */
     position: relative;
     filter: drop-shadow(0 0 40px rgba(0,255,255,0.5));
   }
@@ -91,12 +89,8 @@
       #00ffff 50% 62.5%, #00ccff 62.5% 75%,
       #0066ff 75% 87.5%, #3399ff 87.5% 100%
     );
-    box-shadow: 
-      0 0 60px #00ffff,
-      0 0 100px #8a2be2,
-      inset 0 0 60px rgba(0,0,0,0.7);
+    box-shadow: 0 0 60px #00ffff, 0 0 100px #8a2be2, inset 0 0 60px rgba(0,0,0,0.7);
     border: 12px solid #00ffff;
-    position: relative;
     transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
   }
 
@@ -118,25 +112,13 @@
     z-index: 3;
   }
 
-  .reward-text {
-    font-size: clamp(32px, 10vw, 48px);
-    font-weight: 900;
-    background: linear-gradient(135deg, #00ffff, #8a2be2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px #00ffff;
-  }
+  .reward-text { font-size: clamp(32px, 10vw, 48px); font-weight: 900; background: linear-gradient(135deg, #00ffff, #8a2be2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px #00ffff; }
+  .reward-sub { font-size: clamp(14px, 4vw, 18px); color: #00ffff; margin-top: -4px; text-shadow: 0 0 15px #8a2be2; }
 
-  .reward-sub {
-    font-size: clamp(14px, 4vw, 18px);
-    color: #00ffff;
-    margin-top: -4px;
-    text-shadow: 0 0 15px #8a2be2;
-  }
-
+  /* SPIN NOW button — Niche rakha gaya hai (bottom fixed) */
   #spinButton {
-    position: absolute;
-    bottom: -15%;
+    position: fixed;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, #ff00ff, #8a2be2);
@@ -147,11 +129,10 @@
     font-weight: bold;
     border: none;
     box-shadow: 0 0 40px #ff00ff;
-    cursor: pointer;
-    z-index: 4;
+    z-index: 1000;
     min-width: 70%;
+    max-width: 90vw;
     transition: all 0.2s;
-    touch-action: manipulation;
   }
 
   #spinButton:active {
@@ -163,10 +144,8 @@
     background: #333;
     color: #888;
     box-shadow: none;
-    cursor: not-allowed;
   }
 
-  /* Arrow Pointer – Mobile friendly */
   .arrow {
     position: absolute;
     top: -8%;
@@ -193,7 +172,6 @@
     box-shadow: 0 0 20px #ff00ff;
   }
 
-  /* +1 Flying Animation */
   .plus {
     position: absolute;
     font-size: clamp(50px, 15vw, 70px);
@@ -203,6 +181,8 @@
     animation: flyUp 1.6s forwards;
     text-shadow: 0 0 30px #8a2be2;
     z-index: 5;
+    left: 50%;
+    top: 50%;
   }
 
   @keyframes flyUp {
@@ -226,11 +206,13 @@
       <div class="reward-sub">POINT</div>
     </div>
   </div>
-  <button id="spinButton" ontouchstart="startSpin()">SPIN NOW</button>
 </div>
 
+<!-- SPIN NOW button ab niche fixed hai -->
+<button id="spinButton" ontouchstart="startSpin()">SPIN NOW</button>
+
 <script>
-// Prevent double tap zoom & improve mobile feel
+// Prevent unwanted behaviors on mobile
 document.addEventListener('touchstart', function(){}, {passive: true});
 
 // Telegram WebApp setup
@@ -239,18 +221,18 @@ Telegram.WebApp.expand();
 Telegram.WebApp.setBackgroundColor('#000000');
 Telegram.WebApp.setHeaderColor('bg_color');
 
-// AdsGram Initialization
+// AdsGram Initialization – 100% correct flow for impression counting
 let AdController = null;
 window.addEventListener("load", () => {
   if (window.Adsgram) {
     AdController = window.Adsgram.init({
-      blockId: "19122",  // ← YAHAN APNA REAL BLOCK ID DAAL DO
+      blockId: "19122",  // ← APNA REAL BLOCK ID YAHAN DAAL DO
       debug: false
     });
   }
 });
 
-// User data
+// User & Points
 const user = Telegram.WebApp.initDataUnsafe.user || {};
 const userId = user.id ? user.id.toString() : "guest"+Date.now();
 const userName = user.first_name || user.username || "Guest";
@@ -287,8 +269,6 @@ function showPlusOne() {
   const plus = document.createElement("div");
   plus.className = "plus";
   plus.innerText = "+1";
-  plus.style.left = "50%";
-  plus.style.top = "50%";
   document.querySelector(".wheel-container").appendChild(plus);
   setTimeout(() => plus.remove(), 1600);
 }
@@ -304,9 +284,7 @@ function spinWheel() {
 
   wheel.style.transform = `rotate(${totalRotation}deg)`;
 
-  setTimeout(() => {
-    isSpinning = false;
-  }, 4500);
+  setTimeout(() => { isSpinning = false; }, 4500);
 }
 
 function resetButton() {
@@ -314,15 +292,16 @@ function resetButton() {
   spinButton.disabled = false;
 }
 
+// AdsGram Impression Count – 100% sahi rules follow kiya gaya
 function startSpin(e) {
-  if (e) e.preventDefault(); // Prevent any default touch behavior
+  if (e) e.preventDefault();
   if (spinButton.disabled || isSpinning) {
     Telegram.WebApp.HapticFeedback.notificationOccurred("error");
     return;
   }
 
   if (!AdController) {
-    Telegram.WebApp.showAlert("Ad abhi load nahi hua. Thodi der wait karo.");
+    Telegram.WebApp.showAlert("Ad abhi load nahi hua. Thodi der wait karo ya page refresh karo.");
     return;
   }
 
@@ -332,6 +311,7 @@ function startSpin(e) {
   AdController.show()
     .then((result) => {
       if (result.done) {
+        // Only when user watches FULL ad → impression counts + reward
         points++;
         localStorage.setItem(POINT_KEY, points);
         updatePoints();
@@ -341,6 +321,7 @@ function startSpin(e) {
         Telegram.WebApp.showAlert("शाबाश! +1 Point मिल गया 🎉");
         startCooldown();
       } else {
+        // User skipped or closed early → no impression counted (AdsGram rule)
         Telegram.WebApp.showAlert("Ad poora dekho tabhi point milega 😏");
         resetButton();
       }
