@@ -2,39 +2,83 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
 <title>Spin & Earn</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-  body{margin:0;padding:0;background:#000;font-family:'Segoe UI',sans-serif;color:#fff;overflow:hidden;position:relative}
-  
-  /* Background Glow Effect */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    color: #fff;
+    position: relative;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Background Glow Effect – Mobile optimized */
   body::before {
     content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 70%);
-    transform: translate(-50%, -50%);
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0,255,255,0.25) 0%, transparent 70%);
     pointer-events: none;
-    animation: pulse 8s infinite;
+    animation: pulse 10s infinite;
   }
-  @keyframes pulse { 0%,100% {opacity:0.4} 50% {opacity:0.8} }
+  @keyframes pulse { 0%,100% {opacity:0.35} 50% {opacity:0.7} }
 
-  #top{position:fixed;top:0;left:0;right:0;background:#000;padding:15px;display:flex;justify-content:space-between;align-items:center;z-index:999;
-    box-shadow:0 4px 30px rgba(0,255,255,0.3)}
-  #name{color:#0ff;font-weight:bold;font-size:19px;text-shadow:0 0 15px #0ff}
-  #pointBox{background:linear-gradient(135deg,#00ffff,#8a2be2);color:#000;padding:12px 30px;border-radius:30px;
-    font-weight:bold;font-size:18px;box-shadow:0 0 30px #0ff}
+  #top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  #name {
+    color: #0ff;
+    font-weight: bold;
+    font-size: clamp(16px, 4vw, 18px);
+    text-shadow: 0 0 10px #0ff;
+  }
+
+  #pointBox {
+    background: linear-gradient(135deg, #00ffff, #8a2be2);
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: clamp(15px, 4vw, 17px);
+    box-shadow: 0 0 20px #0ff;
+  }
 
   .wheel-container {
-    width: 340px;
-    height: 340px;
-    margin: 100px auto 70px;
+    width: min(85vw, 340px);
+    height: min(85vw, 340px);
+    margin: 20vh auto 15vh;
     position: relative;
-    filter: drop-shadow(0 0 60px rgba(0,255,255,0.6));
+    filter: drop-shadow(0 0 40px rgba(0,255,255,0.5));
   }
 
   #wheel {
@@ -48,26 +92,25 @@
       #0066ff 75% 87.5%, #3399ff 87.5% 100%
     );
     box-shadow: 
-      0 0 80px #00ffff,
-      0 0 140px #8a2be2,
-      inset 0 0 80px rgba(0,0,0,0.6);
-    border: 14px solid #00ffff;
+      0 0 60px #00ffff,
+      0 0 100px #8a2be2,
+      inset 0 0 60px rgba(0,0,0,0.7);
+    border: 12px solid #00ffff;
     position: relative;
     transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
   }
 
-  /* Center Circle with +1 Point */
   .center-circle {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 140px; height: 140px;
+    width: 40%;
+    height: 40%;
     background: radial-gradient(circle, #000 0%, #111 70%);
     border-radius: 50%;
-    border: 8px solid #00ffff;
-    box-shadow: 
-      0 0 50px #00ffff,
-      inset 0 0 40px rgba(0,255,255,0.4);
+    border: 7px solid #00ffff;
+    box-shadow: 0 0 40px #00ffff, inset 0 0 30px rgba(0,255,255,0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -76,43 +119,44 @@
   }
 
   .reward-text {
-    font-size: 48px;
+    font-size: clamp(32px, 10vw, 48px);
     font-weight: 900;
     background: linear-gradient(135deg, #00ffff, #8a2be2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 30px #00ffff;
-    line-height: 1;
+    text-shadow: 0 0 20px #00ffff;
   }
 
   .reward-sub {
-    font-size: 20px;
+    font-size: clamp(14px, 4vw, 18px);
     color: #00ffff;
-    margin-top: -5px;
-    text-shadow: 0 0 20px #8a2be2;
+    margin-top: -4px;
+    text-shadow: 0 0 15px #8a2be2;
   }
 
-  /* Spin Button */
   #spinButton {
     position: absolute;
-    bottom: -35px; left: 50%;
+    bottom: -15%;
+    left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, #ff00ff, #8a2be2);
     color: white;
-    padding: 20px 70px;
+    padding: 18px 60px;
     border-radius: 50px;
-    font-size: 28px;
+    font-size: clamp(20px, 6vw, 26px);
     font-weight: bold;
     border: none;
-    box-shadow: 0 0 50px #ff00ff;
+    box-shadow: 0 0 40px #ff00ff;
     cursor: pointer;
     z-index: 4;
-    min-width: 220px;
-    transition: all 0.3s;
+    min-width: 70%;
+    transition: all 0.2s;
+    touch-action: manipulation;
   }
 
   #spinButton:active {
-    transform: translateX(-50%) scale(0.95);
+    transform: translateX(-50%) scale(0.92);
+    box-shadow: 0 0 25px #ff00ff;
   }
 
   #spinButton.disabled {
@@ -122,46 +166,48 @@
     cursor: not-allowed;
   }
 
-  /* Arrow Pointer */
+  /* Arrow Pointer – Mobile friendly */
   .arrow {
     position: absolute;
-    top: -30px;
+    top: -8%;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
-    border-bottom: 60px solid #ff00ff;
-    filter: drop-shadow(0 10px 20px #ff00ff);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 40px solid #ff00ff;
+    filter: drop-shadow(0 5px 15px #ff00ff);
     z-index: 10;
   }
 
   .arrow::after {
     content: '';
     position: absolute;
-    top: 20px; left: -20px;
-    width: 40px; height: 40px;
+    top: 12px;
+    left: -15px;
+    width: 30px;
+    height: 30px;
     background: #ff00ff;
     border-radius: 50%;
-    box-shadow: 0 0 30px #ff00ff;
+    box-shadow: 0 0 20px #ff00ff;
   }
 
   /* +1 Flying Animation */
   .plus {
     position: absolute;
-    font-size: 70px;
+    font-size: clamp(50px, 15vw, 70px);
     font-weight: 900;
     color: #00ffff;
     pointer-events: none;
-    animation: flyUp 1.8s forwards;
-    text-shadow: 0 0 40px #8a2be2;
+    animation: flyUp 1.6s forwards;
+    text-shadow: 0 0 30px #8a2be2;
     z-index: 5;
   }
 
   @keyframes flyUp {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-350px) scale(0.4); opacity: 0; }
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -400px) scale(0.5); opacity: 0; }
   }
 </style>
 </head>
@@ -180,36 +226,42 @@
       <div class="reward-sub">POINT</div>
     </div>
   </div>
-  <button id="spinButton" onclick="startSpin()">SPIN NOW</button>
+  <button id="spinButton" ontouchstart="startSpin()">SPIN NOW</button>
 </div>
 
 <script>
+// Prevent double tap zoom & improve mobile feel
+document.addEventListener('touchstart', function(){}, {passive: true});
+
+// Telegram WebApp setup
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
+Telegram.WebApp.setBackgroundColor('#000000');
+Telegram.WebApp.setHeaderColor('bg_color');
 
+// AdsGram Initialization
 let AdController = null;
 window.addEventListener("load", () => {
   if (window.Adsgram) {
     AdController = window.Adsgram.init({
-      blockId: "19122",  // अपना AdsGram Block ID डालो
+      blockId: "19122",  // ← YAHAN APNA REAL BLOCK ID DAAL DO
       debug: false
     });
   }
 });
 
+// User data
 const user = Telegram.WebApp.initDataUnsafe.user || {};
 const userId = user.id ? user.id.toString() : "guest"+Date.now();
 const userName = user.first_name || user.username || "Guest";
 document.getElementById("name").textContent = userName;
 
 const POINT_KEY = "points_"+userId;
-
 let points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
 let isSpinning = false;
 const spinButton = document.getElementById("spinButton");
 
 function updatePoints() {
-  points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
   document.getElementById("point").innerText = points.toLocaleString();
 }
 
@@ -221,13 +273,12 @@ function startCooldown() {
 
   const timer = setInterval(() => {
     timeLeft--;
+    spinButton.textContent = timeLeft;
     if (timeLeft <= 0) {
       clearInterval(timer);
       spinButton.textContent = "SPIN NOW";
       spinButton.disabled = false;
       spinButton.classList.remove("disabled");
-    } else {
-      spinButton.textContent = timeLeft;
     }
   }, 1000);
 }
@@ -238,9 +289,8 @@ function showPlusOne() {
   plus.innerText = "+1";
   plus.style.left = "50%";
   plus.style.top = "50%";
-  plus.style.transform = "translate(-50%, -50%)";
   document.querySelector(".wheel-container").appendChild(plus);
-  setTimeout(() => plus.remove(), 1800);
+  setTimeout(() => plus.remove(), 1600);
 }
 
 function spinWheel() {
@@ -248,7 +298,7 @@ function spinWheel() {
   isSpinning = true;
 
   const wheel = document.getElementById("wheel");
-  const extraSpins = 6 + Math.random() * 4; // लंबा और मजेदार स्पिन
+  const extraSpins = 6 + Math.random() * 4;
   const randomDegree = Math.floor(Math.random() * 360);
   const totalRotation = extraSpins * 360 + randomDegree;
 
@@ -259,14 +309,20 @@ function spinWheel() {
   }, 4500);
 }
 
-function startSpin() {
+function resetButton() {
+  spinButton.textContent = "SPIN NOW";
+  spinButton.disabled = false;
+}
+
+function startSpin(e) {
+  if (e) e.preventDefault(); // Prevent any default touch behavior
   if (spinButton.disabled || isSpinning) {
     Telegram.WebApp.HapticFeedback.notificationOccurred("error");
     return;
   }
 
   if (!AdController) {
-    Telegram.WebApp.showAlert("Ad load नहीं हुआ। Page refresh करो।");
+    Telegram.WebApp.showAlert("Ad abhi load nahi hua. Thodi der wait karo.");
     return;
   }
 
@@ -274,21 +330,25 @@ function startSpin() {
   spinButton.disabled = true;
 
   AdController.show()
-    .then(() => {
-      points++;
-      localStorage.setItem(POINT_KEY, points);
-      updatePoints();
-      showPlusOne();
-      spinWheel();
-      Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-      Telegram.WebApp.showAlert("शाबाश! +1 Point मिल गया 🎉");
-
-      startCooldown();
+    .then((result) => {
+      if (result.done) {
+        points++;
+        localStorage.setItem(POINT_KEY, points);
+        updatePoints();
+        showPlusOne();
+        spinWheel();
+        Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        Telegram.WebApp.showAlert("शाबाश! +1 Point मिल गया 🎉");
+        startCooldown();
+      } else {
+        Telegram.WebApp.showAlert("Ad poora dekho tabhi point milega 😏");
+        resetButton();
+      }
     })
-    .catch(() => {
-      Telegram.WebApp.showAlert("Ad skip या error हुआ। Point नहीं मिला 😔");
-      spinButton.textContent = "SPIN NOW";
-      spinButton.disabled = false;
+    .catch((error) => {
+      console.log("Ad error:", error);
+      Telegram.WebApp.showAlert("Ad nahi dikha. Thodi der baad try karo.");
+      resetButton();
     });
 }
 
