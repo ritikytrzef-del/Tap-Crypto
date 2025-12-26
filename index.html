@@ -1,79 +1,79 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>मेरा Mini App - Adexium Interstitial Ads</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Mini App</title>
 
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <!-- Telegram WebApp SDK (जरूरी – सबसे पहले load करो) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Adexium Ads Script -->
-  <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+    <!-- AdExtra Script (Head में) -->
+    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
 
-  <style>
-    body { font-family: 'Segoe UI', Arial; margin: 0; padding: 20px; background: #f0f2f5; text-align: center; }
-    .container { max-width: 500px; margin: 20px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h1 { color: #1a73e8; }
-    button { background: #34a853; color: white; border: none; padding: 14px 28px; font-size: 16px; border-radius: 8px; margin: 10px; cursor: pointer; }
-    .status { margin-top: 15px; font-weight: bold; }
-    .reward { color: #34a853; }
-    .error { color: #d93025; }
-  </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f0f0f0;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin-top: 20px;
+            background: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>स्वागत है!</h1>
-    <p>यह मेरा Telegram Mini App है।</p>
-    <p>Ad देखकर reward पाएं!</p>
+    <h1>Welcome to My Telegram Mini App</h1>
+    <p>Full-screen ad will show shortly...</p>
 
-    <button id="watchAdButton">Ad देखें (Watch Ads)</button>
+    <!-- AdExtra Placement Div (Body में कहीं भी) -->
+    <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
 
-    <p id="status" class="status"></p>
-  </div>
+    <!-- Ad Display Logic + Success/Error Handling -->
+    <script>
+        const AD_ID = '1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599';
 
-  <script>
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+        // Ad show करने का function
+        function showAd() {
+            if (typeof p !== 'undefined' && typeof p.adextra === 'function') {
+                // Success और Error callbacks के साथ ad call
+                p.adextra(
+                    () => {
+                        console.log('Ad shown successfully!');
+                        // यहाँ reward दो (जैसे coins++, level unlock आदि)
+                        alert('Ad completed! You earned a reward 🎉');
+                    },
+                    () => {
+                        console.log('Ad error or no ad available');
+                        // Error पर retry या skip कर सकते हो
+                        alert('No ad available right now. Try again later.');
+                    }
+                );
+            } else {
+                console.log('AdExtra not loaded yet');
+            }
+        }
 
-    let adexiumWidget; // global variable
+        // App load होने के 2 seconds बाद automatically ad show करो
+        window.addEventListener('load', () => {
+            setTimeout(showAd, 2000);
+        });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      adexiumWidget = new AdexiumWidget({
-        wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b',
-        adFormat: 'interstitial',
-        debug: false  // production में false रखें, test के लिए true
-      });
+        // Optional: Button से manually ad show करने के लिए
+        // अगर auto नहीं चाहते तो button add करो
+    </script>
 
-      // ad मिलने पर automatically display करें
-      adexiumWidget.on('adReceived', (ad) => {
-        adexiumWidget.displayAd(ad);
-        document.getElementById('status').innerHTML = '<span class="reward">Ad दिखाया गया! Reward मिलेगा।</span>';
-      });
+    <!-- Optional Manual Trigger Button (अगर चाहो तो uncomment करो) -->
+    <!--
+    <button onclick="showAd()">Show Ad Now</button>
+    -->
 
-      // ad नहीं मिला तो error
-      adexiumWidget.on('noAdFound', () => {
-        document.getElementById('status').innerHTML = '<span class="error">कोई Ad उपलब्ध नहीं है। बाद में कोशिश करें।</span>';
-      });
-
-      // ad closed या other events अगर जरूरत हो तो add कर सकते हैं
-      adexiumWidget.on('adClosed', () => {
-        console.log('Ad बंद हुआ');
-      });
-    });
-
-    // Manual button click पर ad request
-    document.getElementById('watchAdButton').onclick = () => {
-      document.getElementById('status').innerHTML = '<span class="status">Ad लोड हो रहा है...</span>';
-      adexiumWidget.requestAd();  // format specify नहीं करना पड़ेगा क्योंकि init में interstitial है
-    };
-
-    // Optional: Page load के 5 seconds बाद एक बार auto ad try करें
-    setTimeout(() => {
-      document.getElementById('status').innerHTML = '<span class="status">Ad लोड हो रहा है...</span>';
-      adexiumWidget.requestAd();
-    }, 5000);
-  </script>
 </body>
 </html>
