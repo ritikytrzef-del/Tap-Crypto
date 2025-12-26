@@ -1,339 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<title>Spin & Earn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdExtra Rewarded Video Test</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <!-- AdExtra Script (आपका Placement ID) -->
+    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
 
-<style>
-  * {
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: #000;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #fff;
-    position: relative;
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(0,255,255,0.25) 0%, transparent 70%);
-    pointer-events: none;
-    animation: pulse 10s infinite;
-  }
-  @keyframes pulse { 0%,100% {opacity:0.35} 50% {opacity:0.7} }
-
-  #top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    padding: 12px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  #name {
-    color: #0ff;
-    font-weight: bold;
-    font-size: clamp(16px, 4vw, 18px);
-    text-shadow: 0 0 10px #0ff;
-  }
-
-  #pointBox {
-    background: linear-gradient(135deg, #00ffff, #8a2be2);
-    color: #000;
-    padding: 8px 20px;
-    border-radius: 30px;
-    font-weight: bold;
-    font-size: clamp(15px, 4vw, 17px);
-    box-shadow: 0 0 20px #0ff;
-  }
-
-  .wheel-container {
-    width: min(85vw, 340px);
-    height: min(85vw, 340px);
-    margin: 18vh auto 25vh; /* Extra space at bottom for button */
-    position: relative;
-    filter: drop-shadow(0 0 40px rgba(0,255,255,0.5));
-  }
-
-  #wheel {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: conic-gradient(
-      #ff00ff 0% 12.5%, #ff33ff 12.5% 25%,
-      #8a2be2 25% 37.5%, #9933ff 37.5% 50%,
-      #00ffff 50% 62.5%, #00ccff 62.5% 75%,
-      #0066ff 75% 87.5%, #3399ff 87.5% 100%
-    );
-    box-shadow: 0 0 60px #00ffff, 0 0 100px #8a2be2, inset 0 0 60px rgba(0,0,0,0.7);
-    border: 12px solid #00ffff;
-    transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-  }
-
-  .center-circle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40%;
-    height: 40%;
-    background: radial-gradient(circle, #000 0%, #111 70%);
-    border-radius: 50%;
-    border: 7px solid #00ffff;
-    box-shadow: 0 0 40px #00ffff, inset 0 0 30px rgba(0,255,255,0.4);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-  }
-
-  .reward-text { font-size: clamp(32px, 10vw, 48px); font-weight: 900; background: linear-gradient(135deg, #00ffff, #8a2be2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px #00ffff; }
-  .reward-sub { font-size: clamp(14px, 4vw, 18px); color: #00ffff; margin-top: -4px; text-shadow: 0 0 15px #8a2be2; }
-
-  /* SPIN NOW button — Niche rakha gaya hai (bottom fixed) */
-  #spinButton {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #ff00ff, #8a2be2);
-    color: white;
-    padding: 18px 60px;
-    border-radius: 50px;
-    font-size: clamp(20px, 6vw, 26px);
-    font-weight: bold;
-    border: none;
-    box-shadow: 0 0 40px #ff00ff;
-    z-index: 1000;
-    min-width: 70%;
-    max-width: 90vw;
-    transition: all 0.2s;
-  }
-
-  #spinButton:active {
-    transform: translateX(-50%) scale(0.92);
-    box-shadow: 0 0 25px #ff00ff;
-  }
-
-  #spinButton.disabled {
-    background: #333;
-    color: #888;
-    box-shadow: none;
-  }
-
-  .arrow {
-    position: absolute;
-    top: -8%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 40px solid #ff00ff;
-    filter: drop-shadow(0 5px 15px #ff00ff);
-    z-index: 10;
-  }
-
-  .arrow::after {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: -15px;
-    width: 30px;
-    height: 30px;
-    background: #ff00ff;
-    border-radius: 50%;
-    box-shadow: 0 0 20px #ff00ff;
-  }
-
-  .plus {
-    position: absolute;
-    font-size: clamp(50px, 15vw, 70px);
-    font-weight: 900;
-    color: #00ffff;
-    pointer-events: none;
-    animation: flyUp 1.6s forwards;
-    text-shadow: 0 0 30px #8a2be2;
-    z-index: 5;
-    left: 50%;
-    top: 50%;
-  }
-
-  @keyframes flyUp {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    100% { transform: translate(-50%, -400px) scale(0.5); opacity: 0; }
-  }
-</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f0f0f0;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
 
-<div id="top">
-  <div id="name">Guest</div>
-  <div id="pointBox">Points: <span id="point">0</span></div>
-</div>
+    <h1>AdExtra Rewarded Video Test</h1>
+    <p>नीचे button दबाएं → Rewarded Video ad दिखेगा</p>
+    <p>Video पूरी देखने पर reward मिलेगा!</p>
 
-<div class="wheel-container">
-  <div class="arrow"></div>
-  <div id="wheel">
-    <div class="center-circle">
-      <div class="reward-text">+1</div>
-      <div class="reward-sub">POINT</div>
-    </div>
-  </div>
-</div>
+    <!-- AdExtra Div (आपका Placement ID) -->
+    <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
 
-<!-- SPIN NOW button ab niche fixed hai -->
-<button id="spinButton" ontouchstart="startSpin()">SPIN NOW</button>
+    <!-- Test Button -->
+    <button onclick="showRewardedAd()">Watch Ad & Get Reward</button>
 
-<script>
-// Prevent unwanted behaviors on mobile
-document.addEventListener('touchstart', function(){}, {passive: true});
+    <div id="status"></div>
 
-// Telegram WebApp setup
-Telegram.WebApp.ready();
-Telegram.WebApp.expand();
-Telegram.WebApp.setBackgroundColor('#000000');
-Telegram.WebApp.setHeaderColor('bg_color');
+    <script>
+        const statusDiv = document.getElementById('status');
 
-// AdsGram Initialization – 100% correct flow for impression counting
-let AdController = null;
-window.addEventListener("load", () => {
-  if (window.Adsgram) {
-    AdController = window.Adsgram.init({
-      blockId: "19122",  // ← APNA REAL BLOCK ID YAHAN DAAL DO
-      debug: false
-    });
-  }
-});
+        // Success Callback - Video पूरी देखने पर
+        function onSuccess() {
+            statusDiv.innerHTML = '<strong style="color:green;">✅ Reward मिल गया! +100 Coins</strong>';
+            console.log('Ad completed - Reward granted');
+            // यहाँ अपना actual reward code डालें, जैसे:
+            // addCoins(100);
+            // updateUI();
+        }
 
-// User & Points
-const user = Telegram.WebApp.initDataUnsafe.user || {};
-const userId = user.id ? user.id.toString() : "guest"+Date.now();
-const userName = user.first_name || user.username || "Guest";
-document.getElementById("name").textContent = userName;
+        // Error Callback - Ad नहीं मिला या बंद किया
+        function onError() {
+            statusDiv.innerHTML = '<strong style="color:red;">❌ Ad available नहीं या बंद कर दिया</strong>';
+            console.log('Ad error or closed');
+        }
 
-const POINT_KEY = "points_"+userId;
-let points = parseInt(localStorage.getItem(POINT_KEY)) || 0;
-let isSpinning = false;
-const spinButton = document.getElementById("spinButton");
+        // Callbacks register करें
+        if (window.p_adextra) {
+            p_adextra(onSuccess, onError);
+        }
 
-function updatePoints() {
-  document.getElementById("point").innerText = points.toLocaleString();
-}
+        // Ad दिखाने का function
+        function showRewardedAd() {
+            statusDiv.innerHTML = 'Ad loading...';
 
-function startCooldown() {
-  let timeLeft = 10;
-  spinButton.disabled = true;
-  spinButton.classList.add("disabled");
-  spinButton.textContent = timeLeft;
+            if (window.p_adextra && typeof p_adextra.p === 'function') {
+                p_adextra.p('1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599', {});
+                console.log('Ad show request sent');
+            } else {
+                statusDiv.innerHTML = '<strong style="color:orange;">AdExtra script अभी load नहीं हुआ। थोड़ा wait करें...</strong>';
+                // 2 seconds बाद फिर try करें
+                setTimeout(showRewardedAd, 2000);
+            }
+        }
 
-  const timer = setInterval(() => {
-    timeLeft--;
-    spinButton.textContent = timeLeft;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      spinButton.textContent = "SPIN NOW";
-      spinButton.disabled = false;
-      spinButton.classList.remove("disabled");
-    }
-  }, 1000);
-}
+        // Optional: Page load होते ही auto try (test के लिए)
+        // window.addEventListener('load', () => setTimeout(showRewardedAd, 3000));
+    </script>
 
-function showPlusOne() {
-  const plus = document.createElement("div");
-  plus.className = "plus";
-  plus.innerText = "+1";
-  document.querySelector(".wheel-container").appendChild(plus);
-  setTimeout(() => plus.remove(), 1600);
-}
-
-function spinWheel() {
-  if (isSpinning) return;
-  isSpinning = true;
-
-  const wheel = document.getElementById("wheel");
-  const extraSpins = 6 + Math.random() * 4;
-  const randomDegree = Math.floor(Math.random() * 360);
-  const totalRotation = extraSpins * 360 + randomDegree;
-
-  wheel.style.transform = `rotate(${totalRotation}deg)`;
-
-  setTimeout(() => { isSpinning = false; }, 4500);
-}
-
-function resetButton() {
-  spinButton.textContent = "SPIN NOW";
-  spinButton.disabled = false;
-}
-
-// AdsGram Impression Count – 100% sahi rules follow kiya gaya
-function startSpin(e) {
-  if (e) e.preventDefault();
-  if (spinButton.disabled || isSpinning) {
-    Telegram.WebApp.HapticFeedback.notificationOccurred("error");
-    return;
-  }
-
-  if (!AdController) {
-    Telegram.WebApp.showAlert("Ad abhi load nahi hua. Thodi der wait karo ya page refresh karo.");
-    return;
-  }
-
-  spinButton.textContent = "Loading Ad...";
-  spinButton.disabled = true;
-
-  AdController.show()
-    .then((result) => {
-      if (result.done) {
-        // Only when user watches FULL ad → impression counts + reward
-        points++;
-        localStorage.setItem(POINT_KEY, points);
-        updatePoints();
-        showPlusOne();
-        spinWheel();
-        Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-        Telegram.WebApp.showAlert("शाबाश! +1 Point मिल गया 🎉");
-        startCooldown();
-      } else {
-        // User skipped or closed early → no impression counted (AdsGram rule)
-        Telegram.WebApp.showAlert("Ad poora dekho tabhi point milega 😏");
-        resetButton();
-      }
-    })
-    .catch((error) => {
-      console.log("Ad error:", error);
-      Telegram.WebApp.showAlert("Ad nahi dikha. Thodi der baad try karo.");
-      resetButton();
-    });
-}
-
-updatePoints();
-</script>
 </body>
 </html>
