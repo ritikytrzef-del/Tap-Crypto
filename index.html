@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Mini App</title>
 
-    <!-- Telegram WebApp SDK (जरूरी – सबसे पहले load करो) -->
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- AdExtra Script (Head में) -->
+    <!-- AdExtra Script -->
     <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
 
     <style>
@@ -19,61 +19,64 @@
             background: #f0f0f0;
         }
         button {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 20px;
+            margin: 20px;
             background: #0088cc;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to My Telegram Mini App</h1>
-    <p>Full-screen ad will show shortly...</p>
+    <h1>Telegram Mini App</h1>
+    <p>Reward पाने के लिए ad देखो</p>
 
-    <!-- AdExtra Placement Div (Body में कहीं भी) -->
+    <!-- AdExtra Placement Div -->
     <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
 
-    <!-- Ad Display Logic + Success/Error Handling -->
+    <!-- Button जो ad show करेगा -->
+    <button id="adButton" onclick="showAd()">Watch Ad & Get Reward</button>
+
+    <!-- Ad Logic Script -->
     <script>
         const AD_ID = '1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599';
+        const adButton = document.getElementById('adButton');
 
-        // Ad show करने का function
         function showAd() {
             if (typeof p !== 'undefined' && typeof p.adextra === 'function') {
-                // Success और Error callbacks के साथ ad call
+                // Button disable करो ताकि बार-बार click न हो
+                adButton.disabled = true;
+                adButton.textContent = 'Loading Ad...';
+
                 p.adextra(
                     () => {
+                        // Success: Ad complete हुआ
                         console.log('Ad shown successfully!');
-                        // यहाँ reward दो (जैसे coins++, level unlock आदि)
-                        alert('Ad completed! You earned a reward 🎉');
+                        alert('Ad completed! 🎉 You got your reward!');
+                        adButton.textContent = 'Watch Ad & Get Reward';
+                        adButton.disabled = false;
+                        // यहाँ अपना reward logic add करो (coins++, unlock etc.)
                     },
                     () => {
-                        console.log('Ad error or no ad available');
-                        // Error पर retry या skip कर सकते हो
-                        alert('No ad available right now. Try again later.');
+                        // Error: Ad नहीं आया या skip हुआ
+                        console.log('Ad error or no fill');
+                        alert('No ad available right now. Try again in a few seconds.');
+                        adButton.textContent = 'Watch Ad & Get Reward';
+                        adButton.disabled = false;
                     }
                 );
             } else {
-                console.log('AdExtra not loaded yet');
+                alert('Ad system not ready yet. Please wait...');
+                adButton.disabled = false;
             }
         }
-
-        // App load होने के 2 seconds बाद automatically ad show करो
-        window.addEventListener('load', () => {
-            setTimeout(showAd, 2000);
-        });
-
-        // Optional: Button से manually ad show करने के लिए
-        // अगर auto नहीं चाहते तो button add करो
     </script>
-
-    <!-- Optional Manual Trigger Button (अगर चाहो तो uncomment करो) -->
-    <!--
-    <button onclick="showAd()">Show Ad Now</button>
-    -->
-
 </body>
 </html>
