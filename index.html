@@ -1,83 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="8c25a78822aed88dfe0e1fa55d807415"></script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tap2Rich - Space Style</title>
 
-    <!-- Telegram WebApp SDK -->
+    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- AdExtra Script -->
-    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
+    <script>
+        // 1. Initialization
+        window.TelegramAdsController = new TelegramAdsController();
+        window.TelegramAdsController.initialize({
+            pubId: "991750",
+            appId: "5124",
+        });
+
+        // ✅ Function jo bina button ke ad dikhayega
+        function triggerSpaceAd() {
+            window.TelegramAdsController.show()
+            .then(() => console.log("Ad Displayed"))
+            .catch((err) => console.log("Ad not ready or No-Fill"));
+        }
+
+        // 2. App open hote hi ad dikhao (3 second delay taaki game load ho jaye)
+        setTimeout(triggerSpaceAd, 3000);
+    </script>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background: #f0f0f0;
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; text-align: center; overflow: hidden; }
+        #header { padding: 20px; background: #111; border-bottom: 2px solid #0ff; display: flex; justify-content: space-around; font-weight: bold; }
+        #game { margin-top: 100px; }
+        #tapObject { 
+            width: 250px; height: 250px; margin: 0 auto; 
+            background: radial-gradient(circle, #0ff, #000); 
+            border-radius: 50%; border: 5px solid #0ff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; box-shadow: 0 0 30px #0ff; cursor: pointer;
         }
-        button {
-            padding: 15px 40px;
-            font-size: 20px;
-            margin: 20px;
-            background: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
+        #tapObject:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-    <h1>Telegram Mini App</h1>
-    <p>Reward पाने के लिए ad देखो</p>
 
-    <!-- AdExtra Placement Div -->
-    <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
+    <div id="header">
+        <span>POINTS: <span id="score">0</span></span>
+        <span>ADS MODE: AUTO</span>
+    </div>
 
-    <!-- Button जो ad show करेगा -->
-    <button id="adButton" onclick="showAd()">Watch Ad & Get Reward</button>
+    <div id="game">
+        <div id="tapObject" onclick="handleUserTap()">TAP!</div>
+        <p>Taps until next ad: <span id="count">4</span></p>
+    </div>
 
-    <!-- Ad Logic Script -->
     <script>
-        const AD_ID = '1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599';
-        const adButton = document.getElementById('adButton');
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
 
-        function showAd() {
-            if (typeof p !== 'undefined' && typeof p.adextra === 'function') {
-                // Button disable करो ताकि बार-बार click न हो
-                adButton.disabled = true;
-                adButton.textContent = 'Loading Ad...';
+        let score = 0;
+        let clickTracker = 0; // Space Adventure jaisa counter
 
-                p.adextra(
-                    () => {
-                        // Success: Ad complete हुआ
-                        console.log('Ad shown successfully!');
-                        alert('Ad completed! 🎉 You got your reward!');
-                        adButton.textContent = 'Watch Ad & Get Reward';
-                        adButton.disabled = false;
-                        // यहाँ अपना reward logic add करो (coins++, unlock etc.)
-                    },
-                    () => {
-                        // Error: Ad नहीं आया या skip हुआ
-                        console.log('Ad error or no fill');
-                        alert('No ad available right now. Try again in a few seconds.');
-                        adButton.textContent = 'Watch Ad & Get Reward';
-                        adButton.disabled = false;
-                    }
-                );
-            } else {
-                alert('Ad system not ready yet. Please wait...');
-                adButton.disabled = false;
+        function handleUserTap() {
+            score++;
+            clickTracker++;
+            
+            document.getElementById("score").innerText = score;
+            document.getElementById("count").innerText = (4 - clickTracker);
+
+            // ✅ Space Adventure Logic: Har 4 clicks par auto ad trigger
+            if (clickTracker >= 4) {
+                clickTracker = 0; // Counter reset
+                triggerSpaceAd(); // Bina puche ad show karo
+                document.getElementById("count").innerText = "4";
             }
+
+            Telegram.WebApp.HapticFeedback.impactOccurred("medium");
         }
+
+        // Har 2 minute mein ek compulsory ad (Back-up)
+        setInterval(triggerSpaceAd, 120000);
     </script>
 </body>
 </html>
+
