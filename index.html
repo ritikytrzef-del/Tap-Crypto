@@ -3,75 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdExtra Full Screen Ad</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>AdExtra Telegram App</title>
+
+    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
     
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #eef2f3;
         }
-        button {
-            padding: 15px 30px;
+        .btn-watch {
+            padding: 15px 40px;
             font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            background-color: #28a745; /* Green color */
+            background-color: #0088cc;
             color: white;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 50px;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
         }
-        button:hover {
-            background-color: #218838;
+        .btn-watch:active {
+            transform: scale(0.95);
         }
     </style>
-
-    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
 </head>
 <body>
 
-    <h1>Watch Ad to Earn</h1>
+    <h1>AdExtra Rewards</h1>
 
-    <button onclick="showDirectAd()">Watch Full-Screen Ad</button>
+    <button class="btn-watch" onclick="showAdExtra()">Watch Ad</button>
 
     <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
 
     <script>
-        // Telegram Setup
+        // Initialize Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
         }
 
-        // Step 3: Implement the ad display logic (From your screenshot)
-        function showDirectAd() {
-            // Check if the AdExtra function is loaded
+        // STEP 3: Logic to trigger the ad
+        function showAdExtra() {
+            // Hum check karte hain ki p_adextra function load hua ya nahi
             if (typeof p_adextra === "function") {
-                console.log("Attempting to show AdExtra ad...");
+                console.log("AdExtra function found, launching ad...");
                 
-                // Calling p_adextra(onSuccess, onError) as per screenshot
+                // Screenshot ke logic ke mutabik ad trigger karna
                 p_adextra(
-                    // Success Callback (Ad dekha gaya)
-                    function() {
-                        console.log("Ad Success!");
-                        alert("Congratulations! You earned points.");
-                        // Yahan aap points add karne ka code likh sakte hain
+                    function onSuccess() {
+                        alert("Ad completed! You earned your reward.");
+                        // Yahan apna point adding logic likhein
                     },
-                    // Error Callback (Ad fail hua ya user ne close kiya)
-                    function() {
-                        console.log("Ad Error or Closed");
-                        alert("Ad closed or failed to load. Try again.");
+                    function onError() {
+                        alert("Ad failed or was closed early.");
                     }
                 );
             } else {
-                alert("Ad is loading... please wait 5 seconds and try again.");
-                console.log("p_adextra function not found yet.");
+                console.error("Ad script not yet loaded.");
+                alert("Please wait 2-3 seconds for the ad to initialize.");
             }
         }
     </script>
