@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Watch Ads App</title>
+    <title>AdExtra Full Screen Ad</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,60 +18,62 @@
             background-color: #f0f0f0;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 18px;
             cursor: pointer;
-            background-color: #0088cc;
+            background-color: #28a745; /* Green color */
             color: white;
             border: none;
-            border-radius: 5px;
-            margin: 5px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         button:hover {
-            background-color: #006bb3;
+            background-color: #218838;
         }
     </style>
-    
-    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js" id="adextra-sdk"></script>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script async src="https://partner.adextra.io/jt/1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599.js"></script>
 </head>
 <body>
-    <h1>Watch Ads to Earn Rewards</h1>
-    
-    <button onclick="checkAdStatus()">Check Ad Status</button>
-    
-    <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599" style="width: 100%; text-align: center;"></div>
+
+    <h1>Watch Ad to Earn</h1>
+
+    <button onclick="showDirectAd()">Watch Full-Screen Ad</button>
+
+    <div id="1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599"></div>
 
     <script>
-        // Telegram Web App Initialization
+        // Telegram Setup
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
 
-        const adZoneId = '1c7362f1b1e724e03328b0c5ca9e4bedcb7c0599';
-
-        function checkAdStatus() {
-            // Check if the ad div has content (meaning ad loaded)
-            const adDiv = document.getElementById(adZoneId);
-            
-            if (adDiv && adDiv.innerHTML.trim() !== "") {
-                console.log("Ad is likely visible");
-                alert("Ad is loaded inside the block!");
+        // Step 3: Implement the ad display logic (From your screenshot)
+        function showDirectAd() {
+            // Check if the AdExtra function is loaded
+            if (typeof p_adextra === "function") {
+                console.log("Attempting to show AdExtra ad...");
+                
+                // Calling p_adextra(onSuccess, onError) as per screenshot
+                p_adextra(
+                    // Success Callback (Ad dekha gaya)
+                    function() {
+                        console.log("Ad Success!");
+                        alert("Congratulations! You earned points.");
+                        // Yahan aap points add karne ka code likh sakte hain
+                    },
+                    // Error Callback (Ad fail hua ya user ne close kiya)
+                    function() {
+                        console.log("Ad Error or Closed");
+                        alert("Ad closed or failed to load. Try again.");
+                    }
+                );
             } else {
-                console.log("Ad block is empty, trying to reload...");
-                // Note: Native banner scripts usually auto-load. 
-                // Sometimes re-inserting the script helps if it failed.
-                location.reload(); 
+                alert("Ad is loading... please wait 5 seconds and try again.");
+                console.log("p_adextra function not found yet.");
             }
         }
-        
-        // Error handling for the script
-        const scriptTag = document.getElementById('adextra-sdk');
-        scriptTag.onerror = function() {
-            alert("Ad script failed to load. Check your internet or adblocker.");
-        };
     </script>
 </body>
 </html>
