@@ -1,37 +1,138 @@
-<script type="text/javascript">
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand(); 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Watch Ads - Telegram Mini App</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
-    let adexiumWidget;
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
 
-    document.addEventListener('DOMContentLoaded', () => {
-        adexiumWidget = new AdexiumWidget({
-            wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b', 
-            adFormat: 'interstitial'
-        });
+    <style>
+        /* Telegram Theme Variables support ke sath UI */
+        body {
+            background-color: var(--tg-theme-bg-color, #1e1e1e);
+            color: var(--tg-theme-text-color, #ffffff);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 25px;
+            background-color: var(--tg-theme-secondary-bg-color, #2c2c2c);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            width: 85%;
+            max-width: 350px;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.1s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        button:disabled {
+            background-color: #555555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #statusMsg {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
 
-        const watchBtn = document.getElementById('watchAdBtn');
+    <div class="container">
+        <h2>Watch & Earn</h2>
+        <p>Click the button below to watch an ad.</p>
         
-        watchBtn.addEventListener('click', () => {
-            // Button ko disable kar dein taaki multiple clicks na hon
-            watchBtn.disabled = true;
-            watchBtn.innerText = "Loading Ad...";
+        <button id="watchAdBtn">Watch Ad</button>
+        <div id="statusMsg">Initializing...</div>
+    </div>
 
-            // Ad show karne ki request
-            adexiumWidget.show()
-                .then(() => {
-                    // Ad successfully dikh gaya
-                    watchBtn.disabled = false;
-                    watchBtn.innerText = "Watch Ad to Continue";
-                })
-                .catch((error) => {
-                    // Agar ad fail hota hai, toh screen par error aayega
-                    alert("Ad error: " + JSON.stringify(error));
-                    console.error(error);
-                    watchBtn.disabled = false;
-                    watchBtn.innerText = "Watch Ad to Continue";
+    <script type="text/javascript">
+        // Telegram WebApp Setup
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand(); // Mini app ko full screen karega
+
+        // UI par status update karne ka function
+        function updateStatus(msg) {
+            document.getElementById('statusMsg').innerText = msg;
+            console.log("Status: " + msg);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let adexiumWidget;
+
+            // Adexium Widget Setup
+            try {
+                adexiumWidget = new AdexiumWidget({
+                    wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b', 
+                    adFormat: 'interstitial' // interstitial ya rewardFormat
                 });
+                updateStatus("Ready. Click to watch ad.");
+            } catch (error) {
+                updateStatus("Widget Error: " + error.message);
+            }
+
+            const watchBtn = document.getElementById('watchAdBtn');
+            
+            // Button Click Event
+            watchBtn.addEventListener('click', () => {
+                if (!adexiumWidget) return;
+
+                // Multiple clicks rokne ke liye button disable karein
+                watchBtn.disabled = true;
+                watchBtn.innerText = "Loading Ad...";
+                updateStatus("Fetching ad from Adexium...");
+
+                // Ad Show Request (Promise Based)
+                adexiumWidget.show()
+                    .then(() => {
+                        // Success: Ad pura dikh gaya
+                        updateStatus("Ad viewed successfully!");
+                        watchBtn.disabled = false;
+                        watchBtn.innerText = "Watch Next Ad";
+                        
+                        // YAHAN REWARD KA LOGIC AAYEGA 
+                        // (e.g., fetch request to your server to add points)
+                    })
+                    .catch((error) => {
+                        // Fail: Ad network ne error diya
+                        updateStatus("Ad failed to load.");
+                        
+                        // Error check karne ke liye mobile par alert
+                        let errorMsg = typeof error === 'object' ? JSON.stringify(error) : error;
+                        alert("Adexium Error: " + errorMsg);
+                        
+                        watchBtn.disabled = false;
+                        watchBtn.innerText = "Try Again";
+                    });
+            });
         });
-    });
-</script>
+    </script>
+</body>
+</html>
