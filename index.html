@@ -1,71 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Telegram Mini App</title>
+    <title>Telegram Ad App</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
     <style>
         body {
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #222222);
-            font-family: sans-serif;
+            background-color: #1c1c1c;
+            color: white;
+            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
         }
-        .container { text-align: center; padding: 20px; }
-        button {
-            padding: 10px 20px;
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+        .ad-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+        }
+        .ad-button:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Welcome, <span id="username">User</span>!</h1>
-        <p>Adexium Ads integration is active.</p>
-        <button id="showAdBtn">Manual Ad Show</button>
-    </div>
+    <button class="ad-button" id="watchAdBtn">Watch Ad to Continue</button>
 
     <script type="text/javascript">
-        // 1. Initialize Telegram Web App
+        // Telegram Web App Initialize
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Full screen open karne ke liye
 
-        // Display user name from Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
-        }
+        let adexiumWidget;
 
-        // 2. Adexium Setup
         document.addEventListener('DOMContentLoaded', () => {
-            const adexiumWidget = new AdexiumWidget({
+            // Adexium Initialize (Par bina autoMode ke)
+            adexiumWidget = new AdexiumWidget({
                 wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b', 
                 adFormat: 'interstitial'
             });
 
-            // AutoMode: Ye ads ko automatically trigger karega 
-            adexiumWidget.autoMode();
-
-            // Optional: Button click par ad dikhane ke liye
-            document.getElementById('showAdBtn').addEventListener('click', () => {
+            // Button Click Listener
+            const watchBtn = document.getElementById('watchAdBtn');
+            
+            watchBtn.addEventListener('click', () => {
+                console.log("Loading Ad...");
+                
+                // Manually showing the ad
                 adexiumWidget.show();
             });
         });
+
+        // Optional: Agar aapko ad khatam hone par kuch action lena hai
+        // Adexium events use karein (Check documentation for specific callbacks)
     </script>
 </body>
 </html>
