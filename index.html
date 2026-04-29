@@ -1,71 +1,37 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Ad App</title>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand(); 
 
-    <style>
-        body {
-            background-color: #1c1c1c;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .ad-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #0088cc, #00aaff);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
-        }
-        .ad-button:active {
-            transform: scale(0.98);
-        }
-    </style>
-</head>
-<body>
+    let adexiumWidget;
 
-    <button class="ad-button" id="watchAdBtn">Watch Ad to Continue</button>
-
-    <script type="text/javascript">
-        // Telegram Web App Initialize
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-
-        let adexiumWidget;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Adexium Initialize (Par bina autoMode ke)
-            adexiumWidget = new AdexiumWidget({
-                wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b', 
-                adFormat: 'interstitial'
-            });
-
-            // Button Click Listener
-            const watchBtn = document.getElementById('watchAdBtn');
-            
-            watchBtn.addEventListener('click', () => {
-                console.log("Loading Ad...");
-                
-                // Manually showing the ad
-                adexiumWidget.show();
-            });
+    document.addEventListener('DOMContentLoaded', () => {
+        adexiumWidget = new AdexiumWidget({
+            wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b', 
+            adFormat: 'interstitial'
         });
 
-        // Optional: Agar aapko ad khatam hone par kuch action lena hai
-        // Adexium events use karein (Check documentation for specific callbacks)
-    </script>
-</body>
-</html>
+        const watchBtn = document.getElementById('watchAdBtn');
+        
+        watchBtn.addEventListener('click', () => {
+            // Button ko disable kar dein taaki multiple clicks na hon
+            watchBtn.disabled = true;
+            watchBtn.innerText = "Loading Ad...";
+
+            // Ad show karne ki request
+            adexiumWidget.show()
+                .then(() => {
+                    // Ad successfully dikh gaya
+                    watchBtn.disabled = false;
+                    watchBtn.innerText = "Watch Ad to Continue";
+                })
+                .catch((error) => {
+                    // Agar ad fail hota hai, toh screen par error aayega
+                    alert("Ad error: " + JSON.stringify(error));
+                    console.error(error);
+                    watchBtn.disabled = false;
+                    watchBtn.innerText = "Watch Ad to Continue";
+                });
+        });
+    });
+</script>
