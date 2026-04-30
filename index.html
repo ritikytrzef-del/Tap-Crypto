@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Ad Integration</title>
+    <title>Reward Software - USDT Ad Center</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
-    <script src="https://ad.gigapub.tech/script?id=4819"></script>
-
     <style>
         body {
-            background-color: #121212;
-            color: white;
-            font-family: sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -23,50 +21,58 @@
             min-height: 100vh;
             margin: 0;
         }
-        .container { text-align: center; width: 90%; max-width: 400px; }
+        .container { 
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; 
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h2 { color: #f39c12; margin-bottom: 20px; }
         
         .btn {
-            padding: 15px;
+            padding: 16px;
             width: 100%;
-            margin: 10px 0;
+            margin: 12px 0;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            transition: transform 0.2s, background 0.3s;
         }
+        .btn:active { transform: scale(0.98); }
         
-        /* Adexium Button Style */
-        #adexiumBtn { background-color: #0088cc; color: white; }
-        
-        /* Gigapub Button Style */
-        #gigapubBtn { background-color: #f39c12; color: white; }
+        #adexiumBtn { background: linear-gradient(135deg, #0088cc, #005588); color: white; }
+        #gigapubBtn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; }
 
-        .btn:disabled { background-color: #444; opacity: 0.7; }
+        .btn:disabled { background: #333 !important; cursor: not-allowed; opacity: 0.6; }
         
         #log {
             margin-top: 20px;
-            font-size: 12px;
-            color: #88ff88;
+            font-size: 13px;
+            color: #00ffcc;
             background: #000;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             text-align: left;
-            min-height: 50px;
+            border: 1px solid #333;
+            min-height: 40px;
         }
+        .usdt-text { color: #2ecc71; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Ad Center</h2>
+        <h2>Earn USDT</h2>
         
-        <button id="adexiumBtn" class="btn">Watch Adexium Ad</button>
-        
-        <button id="gigapubBtn" class="btn">Watch Gigapub Ad</button>
+        <button id="adexiumBtn" class="btn">Watch Video Ad</button>
+        <button id="gigapubBtn" class="btn">Complete Offers (Offerwall)</button>
 
-        <div id="log">Status: Ready</div>
+        <div id="log">Status: Initializing...</div>
     </div>
 
     <script type="text/javascript">
@@ -75,58 +81,84 @@
         tg.expand();
 
         const logDiv = document.getElementById('log');
+        const API_URL = "https://your-backend-api.com/update-balance"; // Apna API URL yahan dalein
+        const conversionRate = 1000; // 1000 Points = 1 USDT
+
         function updateStatus(msg) {
-            logDiv.innerText = "Status: " + msg;
-            console.log(msg);
+            logDiv.innerHTML = `Status: ${msg}`;
         }
+
+        // --- GIGAPUB OFFERWALL SETUP ---
+        (function() {
+            if (!window.loadOfferWallSDK) {
+                const script = document.createElement('script');
+                script.src = 'https://wall.giga.pub/api/v1/loader.js?projectId=4819';
+                script.async = true;
+                document.head.appendChild(script);
+            }
+        })();
+
+        window.loadGigaSDKCallbacks = window.loadGigaSDKCallbacks || [];
+        window.loadGigaSDKCallbacks.push(() => {
+            window.loadOfferWallSDK({ projectId: '4819' })
+                .then(sdk => {
+                    window.gigaOfferWallSDK = sdk;
+                    updateStatus("Systems Ready");
+
+                    // Reward Claim Handler
+                    sdk.on('rewardClaim', async (data) => {
+                        const usdtEarned = (data.amount / conversionRate).toFixed(4);
+                        updateStatus(`Earning: <span class="usdt-text">${usdtEarned} USDT</span>...`);
+
+                        try {
+                            const response = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    uid: tg.initDataUnsafe.user?.id || "guest",
+                                    amount: usdtEarned,
+                                    rewardId: data.rewardId,
+                                    hash: data.hash
+                                })
+                            });
+
+                            if (response.ok) {
+                                updateStatus(`Successfully Credited <span class="usdt-text">${usdtEarned} USDT</span>!`);
+                                sdk.confirmReward(data.rewardId, data.hash);
+                            }
+                        } catch (e) {
+                            updateStatus("Reward verification failed.");
+                        }
+                    });
+                })
+                .catch(() => updateStatus("Offerwall failed to load."));
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. ADEXIUM SETUP ---
+            // --- ADEXIUM INTEGRATION ---
             const adexiumAds = new AdexiumWidget({
                 wid: '46231eef-4c57-40c2-8f58-fdcdc4d0535b',
-                adFormat: 'interstitial',
-                debug: false 
+                adFormat: 'interstitial'
             });
 
-            const adexiumBtn = document.getElementById('adexiumBtn');
-            adexiumBtn.onclick = () => {
-                updateStatus("Requesting Adexium...");
-                adexiumBtn.disabled = true;
+            document.getElementById('adexiumBtn').onclick = () => {
+                updateStatus("Loading Video Ad...");
                 adexiumAds.requestAd('interstitial');
             };
 
             adexiumAds.on('adReceived', (ad) => {
-                updateStatus("Adexium Ad Received!");
+                updateStatus("Ad Ready!");
                 adexiumAds.displayAd(ad);
-                adexiumBtn.disabled = false;
             });
 
-            adexiumAds.on('noAdFound', () => {
-                updateStatus("Adexium: No ads available.");
-                alert("Adexium Ads not found.");
-                adexiumBtn.disabled = false;
-            });
-
-
-            // --- 2. GIGAPUB SETUP ---
-            const gigapubBtn = document.getElementById('gigapubBtn');
-            gigapubBtn.onclick = () => {
-                updateStatus("Requesting Gigapub...");
-                gigapubBtn.disabled = true;
-
-                // Gigapub global function call
-                window.showGiga()
-                    .then(() => {
-                        updateStatus("Gigapub: Ad Reward Success!");
-                        alert("Reward Earned from Gigapub!");
-                        gigapubBtn.disabled = false;
-                    })
-                    .catch(e => {
-                        updateStatus("Gigapub Error: " + e);
-                        alert("Gigapub Ad failed to load.");
-                        gigapubBtn.disabled = false;
-                    });
+            // --- OFFERWALL BUTTON CLICK ---
+            document.getElementById('gigapubBtn').onclick = () => {
+                if (window.gigaOfferWallSDK) {
+                    window.gigaOfferWallSDK.open();
+                } else {
+                    alert("Offerwall is still loading, please wait...");
+                }
             };
         });
     </script>
