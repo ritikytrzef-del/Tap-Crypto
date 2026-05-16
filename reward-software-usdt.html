@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Reward Software - USDT Ad Center</title>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Adexium Widget -->
+    <script type="text/javascript" src="https://cdn.techtg.space/assets/js/tg-ads-co-widget.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --bg: #080b12;
+        --surface: #0e1420;
+        --surface2: #131b28;
+        --border: rgba(255,255,255,0.07);
+        --border-bright: rgba(0,220,130,0.3);
+        --primary: #00dc82;
+        --primary-dark: #00a860;
+        --blue: #0088cc;
+        --blue-dark: #005588;
+        --gold: #f5c542;
+        --red: #f25f5c;
+        --text: #e8f4f0;
+        --text-muted: #8ba8a0;
+        --card-grad: linear-gradient(145deg, #0e1a14 0%, #090f0c 60%, #060a08 100%);
+        --accent-grad: linear-gradient(135deg, #00dc82 0%, #00a860 100%);
+        --blue-grad: linear-gradient(135deg, #0088cc 0%, #005588 100%);
+        --glow-green: 0 0 24px rgba(0,220,130,0.3);
+        --glow-blue: 0 0 20px rgba(0,136,204,0.25);
+        --radius: 20px;
+        --radius-sm: 14px;
+    }
+
+    html { background: var(--bg); }
+    body {
+        font-family: 'Sora', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 0 14px 110px;
+        overflow-x: hidden;
+    }
+
+    /* BG PATTERN */
+    body::before {
+        content: '';
+        position: fixed; inset: 0; z-index: 0;
+        background-image:
+            linear-gradient(rgba(0,220,130,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,220,130,0.03) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+    }
+    body::after {
+        content: '';
+        position: fixed; bottom: -150px; right: -100px; z-index: 0;
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(0,220,130,0.06) 0%, transparent 70%);
+        pointer-events: none;
+        animation: driftBg 14s ease-in-out infinite alternate;
+    }
+    @keyframes driftBg { from{transform:translate(0,0)} to{transform:translate(-60px,-50px)} }
+
+    .container { max-width: 500px; margin: 0 auto; position: relative; z-index: 1; }
+
+    /* HEADER */
+    .header {
+        padding: 24px 0 16px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .app-title {
+        font-size: 20px; font-weight: 800;
+        background: linear-gradient(90deg, #00dc82 0%, #00a860 50%, #ffffff 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+    .app-sub {
+        font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400;
+        display: flex; align-items: center; gap: 5px;
+    }
+    .online-dot {
+        width: 6px; height: 6px; background: var(--primary);
+        border-radius: 50%; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .verified-badge {
+        display: flex; align-items: center; gap: 5px;
+        background: rgba(0,220,130,0.08);
+        border: 1px solid rgba(0,220,130,0.25);
+        padding: 6px 12px; border-radius: 50px;
+        font-size: 10px; font-weight: 700; color: var(--primary);
+        letter-spacing: 0.5px;
+    }
+
+    /* BALANCE CARD */
+    .balance-card {
+        background: var(--card-grad);
+        border: 1px solid rgba(0,220,130,0.18);
+        border-radius: 26px;
+        padding: 24px 22px 20px;
+        margin: 0 0 14px;
+        position: relative; overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .balance-card::before {
+        content: ''; position: absolute;
+        top: -60px; right: -60px;
+        width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(0,220,130,0.12), transparent 70%);
+    }
+    .balance-card::after {
+        content: ''; position: absolute;
+        bottom: -50px; left: -30px;
+        width: 150px; height: 150px;
+        background: radial-gradient(circle, rgba(0,136,204,0.08), transparent 70%);
+    }
+    .bal-label {
+        font-size: 10px; font-weight: 700; letter-spacing: 2px;
+        color: var(--text-muted); text-transform: uppercase;
+        display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    }
+    .bal-label::before { content: ''; width: 14px; height: 1px; background: var(--text-muted); }
+    .bal-usdt {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 36px; font-weight: 700; letter-spacing: -1px;
+        color: #fff; line-height: 1;
+        display: flex; align-items: baseline; gap: 8px;
+    }
+    .bal-unit { font-size: 14px; color: var(--primary); font-weight: 700; }
+    .bal-inr-row {
+        margin-top: 12px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .bal-inr {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px; color: var(--text-muted);
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border);
+        padding: 4px 10px; border-radius: 7px;
+    }
+    .mini-stats-row { display: flex; gap: 8px; margin-top: 14px; }
+    .mini-stat {
+        flex: 1; background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 11px; padding: 9px 10px; text-align: center;
+    }
+    .mini-stat-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 15px; font-weight: 700; color: var(--primary);
+    }
+    .mini-stat-lbl { font-size: 9px; color: var(--text-muted); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* DAILY BONUS CARD */
+    .bonus-card {
+        border-radius: 22px; padding: 18px 20px; margin-bottom: 14px;
+        position: relative; overflow: hidden;
+        background: linear-gradient(135deg, #001a0f 0%, #000e08 100%);
+        border: 1px solid rgba(0,220,130,0.22);
+        box-shadow: 0 8px 32px rgba(0,220,130,0.07);
+    }
+    .bonus-card::before {
+        content: ''; position: absolute; top: -30px; right: -30px;
+        width: 140px; height: 140px;
+        background: radial-gradient(circle, rgba(0,220,130,0.1), transparent 70%);
+    }
+    .bonus-top { display: flex; align-items: center; justify-content: space-between; }
+    .bonus-left { display: flex; align-items: center; gap: 12px; }
+    .bonus-icon-wrap {
+        width: 46px; height: 46px; border-radius: 14px;
+        background: linear-gradient(135deg, #00dc82, #00a860);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+        box-shadow: 0 6px 18px rgba(0,220,130,0.35);
+    }
+    .bonus-title { font-size: 14px; font-weight: 800; color: #e0fff0; margin-bottom: 2px; }
+    .bonus-sub { font-size: 11px; color: #6fe8b0; font-weight: 600; }
+    .bonus-amount {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 17px; font-weight: 800; color: var(--primary); text-align: right;
+    }
+    .bonus-amount-label { font-size: 9px; color: #6fe8b0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-align: right; }
+
+    .btn-claim {
+        width: 100%; margin-top: 14px;
+        padding: 13px; border: none; border-radius: 13px;
+        font-size: 13px; font-weight: 800; cursor: pointer;
+        font-family: 'Sora', sans-serif; letter-spacing: 0.5px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.2s;
+    }
+    .btn-claim:active { transform: scale(0.97); }
+    .btn-claim-ready {
+        background: linear-gradient(135deg, #00dc82, #00a860);
+        color: #003a20;
+        box-shadow: 0 6px 20px rgba(0,220,130,0.35);
+    }
+    .btn-claim-done {
+        background: rgba(255,255,255,0.04);
+        color: #6fe8b0;
+        border: 1px solid rgba(0,220,130,0.15);
+        cursor: not-allowed;
+    }
+    .bonus-timer {
+        margin-top: 8px; text-align: center;
+        font-size: 11px; color: #6fe8b0; font-weight: 600;
+        display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .streak-row {
+        margin-top: 10px; display: flex; align-items: center; gap: 7px;
+        background: rgba(0,220,130,0.05); border: 1px solid rgba(0,220,130,0.1);
+        border-radius: 9px; padding: 7px 11px;
+    }
+    .streak-dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: rgba(0,220,130,0.12); border: 1px solid rgba(0,220,130,0.2); flex-shrink: 0;
+    }
+    .streak-dot.claimed { background: var(--primary); box-shadow: 0 0 6px rgba(0,220,130,0.55); }
+    .streak-label { font-size: 10px; color: #6fe8b0; font-weight: 600; margin-left: auto; }
+
+    /* SECTION TITLE */
+    .section-title {
+        font-size: 11px; font-weight: 700; letter-spacing: 2px;
+        color: var(--text-muted); text-transform: uppercase;
+        margin: 18px 0 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(0,220,130,0.15); }
+
+    /* AD CARDS */
+    .ads-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .ad-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 16px;
+        display: flex; align-items: center; gap: 14px;
+        position: relative; overflow: hidden;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .ad-card:hover { transform: translateY(-1px); }
+
+    .ad-card.adexium-card {
+        background: linear-gradient(145deg, #001a0f, #000e08);
+        border: 1px solid rgba(0,220,130,0.25);
+        box-shadow: 0 0 20px rgba(0,220,130,0.08);
+    }
+
+    .ad-icon-wrap {
+        width: 50px; height: 50px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+    }
+    .icon-green { background: rgba(0,220,130,0.1); color: var(--primary); border: 1px solid rgba(0,220,130,0.2); }
+    .icon-blue { background: rgba(0,136,204,0.1); color: var(--blue); border: 1px solid rgba(0,136,204,0.2); }
+
+    .ad-info { flex: 1; min-width: 0; }
+    .ad-badge {
+        display: inline-block;
+        font-size: 8px; font-weight: 800; letter-spacing: 1px;
+        padding: 2px 7px; border-radius: 50px; margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+    .badge-green { background: rgba(0,220,130,0.1); color: var(--primary); border: 1px solid rgba(0,220,130,0.25); }
+    .badge-blue { background: rgba(0,136,204,0.1); color: var(--blue); border: 1px solid rgba(0,136,204,0.2); }
+    .badge-premium { background: rgba(245,197,66,0.1); color: var(--gold); border: 1px solid rgba(245,197,66,0.25); }
+
+    .ad-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .ad-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .ad-reward-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px; font-weight: 800; margin-top: 2px;
+    }
+
+    .btn-watch {
+        border: none; padding: 10px 16px;
+        border-radius: 12px; font-size: 12px; font-weight: 700;
+        cursor: pointer; font-family: 'Sora', sans-serif;
+        display: flex; align-items: center; gap: 6px;
+        transition: opacity 0.2s, transform 0.1s;
+        flex-shrink: 0; white-space: nowrap;
+    }
+    .btn-watch:active { transform: scale(0.96); opacity: 0.85; }
+    .btn-green { background: var(--accent-grad); color: #003a20; }
+    .btn-blue { background: var(--blue-grad); color: white; }
+    .btn-disabled { background: rgba(255,255,255,0.05); color: #666; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.07); }
+
+    /* WITHDRAW VIEW */
+    .withdraw-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 18px; margin-bottom: 10px;
+    }
+    .withdraw-card h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+
+    .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .method-btn {
+        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+        border-radius: 12px; padding: 12px 10px; text-align: center;
+        cursor: pointer; transition: all 0.2s; font-family: 'Sora', sans-serif;
+    }
+    .method-btn:hover { border-color: rgba(0,220,130,0.3); background: rgba(0,220,130,0.04); }
+    .method-btn.active { border-color: var(--primary); background: rgba(0,220,130,0.08); }
+    .method-btn .m-icon { font-size: 18px; margin-bottom: 5px; }
+    .method-btn .m-name { font-size: 11px; font-weight: 700; color: var(--text); }
+    .method-btn .m-min { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+
+    .input-group { margin-bottom: 10px; }
+    .input-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 5px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .input-group input {
+        width: 100%; background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border); color: var(--text);
+        border-radius: 11px; padding: 12px 14px; font-size: 13px;
+        font-family: 'JetBrains Mono', monospace; outline: none;
+        transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: rgba(0,220,130,0.4); }
+    .input-group input::placeholder { color: #445; }
+
+    .btn-submit-main {
+        width: 100%; border: none; padding: 14px;
+        border-radius: 14px; font-size: 14px; font-weight: 800;
+        cursor: pointer; font-family: 'Sora', sans-serif; letter-spacing: 0.5px;
+        background: var(--accent-grad); color: #003a20;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 8px 24px rgba(0,220,130,0.3); transition: all 0.2s;
+    }
+    .btn-submit-main:active { transform: scale(0.98); opacity: 0.9; }
+
+    /* HISTORY */
+    .history-item {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); padding: 13px 15px; margin-bottom: 8px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .history-left { display: flex; align-items: center; gap: 11px; }
+    .history-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: rgba(0,220,130,0.07); border: 1px solid rgba(0,220,130,0.15);
+        display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+    }
+    .history-amount { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--primary); }
+    .history-meta { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .status-badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 50px; }
+    .status-success { background: rgba(0,220,130,0.1); color: var(--primary); border: 1px solid rgba(0,220,130,0.2); }
+    .status-pending { background: rgba(245,197,66,0.1); color: var(--gold); border: 1px solid rgba(245,197,66,0.2); }
+
+    /* BOTTOM NAV */
+    .nav-fixed {
+        position: fixed; bottom: 14px; left: 14px; right: 14px;
+        background: rgba(8,11,18,0.95); backdrop-filter: blur(20px);
+        border: 1px solid rgba(0,220,130,0.1);
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        padding: 8px 4px; border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+        max-width: 472px; margin: 0 auto; z-index: 999;
+    }
+    .nav-btn {
+        background: none; border: none; color: #4a6a60;
+        font-size: 9px; font-weight: 600; text-align: center;
+        padding: 6px 4px; cursor: pointer; font-family: 'Sora', sans-serif;
+        border-radius: 12px; transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .nav-btn i { font-size: 16px; }
+    .nav-btn.active { color: var(--primary); background: rgba(0,220,130,0.1); }
+    .nav-btn.active i { filter: drop-shadow(0 0 6px rgba(0,220,130,0.6)); }
+
+    /* VIEWS */
+    .view { display: none; }
+    .view.active { display: block; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    /* OVERLAY */
+    #overlay {
+        position: fixed; inset: 0; z-index: 10000;
+        background: rgba(8,11,18,0.94); backdrop-filter: blur(10px);
+        display: none; justify-content: center; align-items: center; flex-direction: column; gap: 16px;
+    }
+    #overlay.show { display: flex; }
+    .loader-ring {
+        width: 48px; height: 48px; border-radius: 50%;
+        border: 3px solid rgba(0,220,130,0.15);
+        border-top-color: var(--primary);
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loader-text { font-size: 12px; font-weight: 700; color: var(--primary); letter-spacing: 2px; }
+
+    .empty-state { text-align: center; padding: 50px 20px; }
+    .empty-state i { font-size: 38px; color: #3a5a50; margin-bottom: 12px; display: block; }
+    .empty-state p { color: var(--text-muted); font-size: 13px; }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,220,130,0.2); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="overlay">
+    <div class="loader-ring"></div>
+    <div class="loader-text">LOADING AD...</div>
+</div>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <div class="app-title">Reward Software</div>
+            <div class="app-sub">
+                <span class="online-dot"></span>
+                <span id="greeting-user">USDT Ad Center</span>
+            </div>
+        </div>
+        <div class="verified-badge">
+            <i class="fa-brands fa-telegram"></i> VERIFIED
+        </div>
+    </div>
+
+    <!-- HOME VIEW -->
+    <div id="home-view" class="view active">
+
+        <!-- BALANCE CARD -->
+        <div class="balance-card">
+            <div class="bal-label">Total Balance</div>
+            <div class="bal-usdt">
+                <span id="display-usdt">0.0000</span>
+                <span class="bal-unit">USDT</span>
+            </div>
+            <div class="bal-inr-row">
+                <div class="bal-inr">≈ ₹<span id="display-inr">0.00</span></div>
+                <div style="font-size:10px;color:var(--text-muted);">Rate: ₹88/USDT</div>
+            </div>
+            <div class="mini-stats-row">
+                <div class="mini-stat">
+                    <div class="mini-stat-val" id="ms-today">0</div>
+                    <div class="mini-stat-lbl">Today Ads</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-val" id="ms-total">0</div>
+                    <div class="mini-stat-lbl">Total Ads</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-val" id="ms-daily">$0.00</div>
+                    <div class="mini-stat-lbl">Earned Today</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAILY BONUS -->
+        <div class="bonus-card">
+            <div class="bonus-top">
+                <div class="bonus-left">
+                    <div class="bonus-icon-wrap">🎁</div>
+                    <div>
+                        <div class="bonus-title">Daily Bonus</div>
+                        <div class="bonus-sub">Watch ad to claim</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="bonus-amount">$0.01</div>
+                    <div class="bonus-amount-label">USDT</div>
+                </div>
+            </div>
+            <div class="streak-row" id="streak-row">
+                <div id="streak-dots" style="display:flex;gap:5px;"></div>
+                <div class="streak-label" id="streak-label">0 Day Streak</div>
+            </div>
+            <button class="btn-claim btn-claim-ready" id="bonus-btn" onclick="claimDailyBonus()">
+                <i class="fa-solid fa-gift"></i> CLAIM DAILY BONUS
+            </button>
+            <div class="bonus-timer" id="bonus-timer" style="display:none;">
+                <i class="fa-solid fa-clock" style="font-size:10px;"></i>
+                <span id="bonus-countdown">Resets tomorrow</span>
+            </div>
+        </div>
+
+        <div class="section-title">Ads Center</div>
+
+        <!-- AD CARDS -->
+        <div class="ads-list" id="ads-list">
+            <!-- Loaded by JS -->
+        </div>
+
+    </div>
+
+    <!-- ADS VIEW -->
+    <div id="ads-view" class="view">
+        <div class="section-title" style="margin-top:24px;">Watch & Earn</div>
+        <div class="ads-list" id="ads-list-2">
+            <!-- Same content, loaded by JS -->
+        </div>
+    </div>
+
+    <!-- WITHDRAW VIEW -->
+    <div id="withdraw-view" class="view">
+        <div class="section-title" style="margin-top:24px;">Withdraw USDT</div>
+
+        <div class="withdraw-card">
+            <h3><i class="fa-solid fa-wallet" style="color:var(--primary);margin-right:8px;"></i>Select Payment Method</h3>
+            <div class="method-grid">
+                <div class="method-btn" onclick="selectMethod('USDT TRC20', 1, 'USDT', 'Enter TRC20 Wallet Address', 20)">
+                    <div class="m-icon">💰</div>
+                    <div class="m-name">USDT TRC20</div>
+                    <div class="m-min">Min: $1</div>
+                </div>
+                <div class="method-btn" onclick="selectMethod('USDT BEP20', 1, 'USDT', 'Enter BEP20 Wallet Address', 10)">
+                    <div class="m-icon">🔶</div>
+                    <div class="m-name">USDT BEP20</div>
+                    <div class="m-min">Min: $1</div>
+                </div>
+                <div class="method-btn" onclick="selectMethod('UPI', 5, 'INR', 'Enter UPI ID (example@upi)', 0)">
+                    <div class="m-icon">🇮🇳</div>
+                    <div class="m-name">UPI (India)</div>
+                    <div class="m-min">Min: ₹5</div>
+                </div>
+                <div class="method-btn" onclick="selectCwallet()">
+                    <div class="m-icon">💼</div>
+                    <div class="m-name">Cwallet</div>
+                    <div class="m-min">$0.0001/week</div>
+                </div>
+            </div>
+
+            <div id="withdraw-form" style="display:none;">
+                <div class="input-group">
+                    <label>Payment Info</label>
+                    <input type="text" id="p-info" placeholder="Enter wallet address">
+                </div>
+                <div class="input-group">
+                    <label>Amount</label>
+                    <input type="number" id="p-amt" placeholder="Enter amount" step="0.0001">
+                </div>
+                <div id="req-note" style="display:none;font-size:11px;color:#f5c542;background:rgba(245,197,66,0.08);border:1px solid rgba(245,197,66,0.2);border-radius:9px;padding:9px 12px;margin-bottom:10px;gap:6px;align-items:center;"></div>
+                <button class="btn-submit-main" onclick="submitWithdraw()">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div id="history-view" class="view">
+        <div class="section-title" style="margin-top:24px;">Transaction History</div>
+        <div id="history-list"></div>
+    </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-fixed">
+    <button class="nav-btn active" onclick="switchTab('home',this)">
+        <i class="fa-solid fa-house"></i> Home
+    </button>
+    <button class="nav-btn" onclick="switchTab('ads',this)">
+        <i class="fa-solid fa-play-circle"></i> Ads
+    </button>
+    <button class="nav-btn" onclick="switchTab('withdraw',this)">
+        <i class="fa-solid fa-wallet"></i> Withdraw
+    </button>
+    <button class="nav-btn" onclick="switchTab('history',this)">
+        <i class="fa-solid fa-clock-rotate-left"></i> History
+    </button>
+</div>
+
+<script>
+    // ── CONFIG ──────────────────────────────────────────────
+    const CONFIG = {
+        // 🔑 Yahan apna Telegram Bot Token aur Admin ID dalein
+        BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',
+        ADMIN_ID:  'YOUR_ADMIN_CHAT_ID_HERE',
+
+        // Adexium Widget ID (aapka original)
+        ADEXIUM_WID: '46231eef-4c57-40c2-8f58-fdcdc4d0535b',
+
+        // Earning values (USDT)
+        ADEXIUM_VAL:    0.002,
+        DAILY_BONUS_VAL: 0.01,
+
+        // Daily limits
+        ADEXIUM_DAILY_LIMIT: 10,
+
+        // INR rate
+        INR_RATE: 88,
+    };
+
+    // ── TELEGRAM ────────────────────────────────────────────
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // ── LOCAL DB ────────────────────────────────────────────
+    let db = JSON.parse(localStorage.getItem('reward_sw_v1')) || {
+        balance: 0, totalAds: 0,
+        todayAdexium: 0, lastAdexiumTime: 0,
+        date: new Date().toLocaleDateString(),
+        history: [],
+        bonusLastClaim: 0, bonusStreak: 0,
+        cwalletLastWithdraw: 0
+    };
+    if (!db.cwalletLastWithdraw) db.cwalletLastWithdraw = 0;
+
+    function saveDb() { localStorage.setItem('reward_sw_v1', JSON.stringify(db)); }
+
+    // ── OVERLAY ─────────────────────────────────────────────
+    function showOverlay(v) {
+        document.getElementById('overlay').className = v ? 'show' : '';
+    }
+
+    // ── IST MIDNIGHT ────────────────────────────────────────
+    function getISTMidnight() {
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        const ist = new Date(utc + istOffset);
+        ist.setHours(0,0,0,0);
+        return ist.getTime() - istOffset - now.getTimezoneOffset()*60000;
+    }
+
+    // ── UPDATE UI ───────────────────────────────────────────
+    function updateUI() {
+        const today = new Date().toLocaleDateString();
+        if (db.date !== today) {
+            db.todayAdexium = 0;
+            db.date = today;
+        }
+
+        document.getElementById('display-usdt').innerText = db.balance.toFixed(4);
+        document.getElementById('display-inr').innerText = (db.balance * CONFIG.INR_RATE).toFixed(2);
+        document.getElementById('ms-today').innerText = db.todayAdexium;
+        document.getElementById('ms-total').innerText = db.totalAds;
+
+        const istMidnight = getISTMidnight();
+        const bonusToday = db.bonusLastClaim >= istMidnight ? CONFIG.DAILY_BONUS_VAL : 0;
+        const adsEarned = db.todayAdexium * CONFIG.ADEXIUM_VAL;
+        document.getElementById('ms-daily').innerText = '$' + (adsEarned + bonusToday).toFixed(3);
+
+        updateBonusUI();
+        loadAdCards();
+        saveDb();
+    }
+
+    // ── BONUS UI ────────────────────────────────────────────
+    function updateBonusUI() {
+        const claimed = db.bonusLastClaim >= getISTMidnight();
+        const btn = document.getElementById('bonus-btn');
+        const timer = document.getElementById('bonus-timer');
+        const dotsEl = document.getElementById('streak-dots');
+
+        dotsEl.innerHTML = '';
+        const streak = Math.min(db.bonusStreak || 0, 7);
+        for (let i = 0; i < 7; i++) {
+            const d = document.createElement('div');
+            d.className = 'streak-dot' + (i < streak ? ' claimed' : '');
+            dotsEl.appendChild(d);
+        }
+        document.getElementById('streak-label').innerText = (db.bonusStreak||0)+' Day Streak';
+
+        if (claimed) {
+            btn.className = 'btn-claim btn-claim-done';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> CLAIMED TODAY';
+            btn.disabled = true;
+            timer.style.display = 'flex';
+            startBonusCountdown();
+        } else {
+            btn.className = 'btn-claim btn-claim-ready';
+            btn.innerHTML = '<i class="fa-solid fa-gift"></i> CLAIM DAILY BONUS';
+            btn.disabled = false;
+            timer.style.display = 'none';
+        }
+    }
+
+    let bonusCountdown = null;
+    function startBonusCountdown() {
+        if (bonusCountdown) clearInterval(bonusCountdown);
+        function tick() {
+            const istOffset = 5.5*60*60*1000;
+            const utc = Date.now() + new Date().getTimezoneOffset()*60000;
+            const istNow = new Date(utc + istOffset);
+            const next = new Date(istNow);
+            next.setDate(next.getDate()+1); next.setHours(0,0,0,0);
+            const diff = next - istNow;
+            const h = Math.floor(diff/3600000);
+            const m = Math.floor((diff%3600000)/60000);
+            const s = Math.floor((diff%60000)/1000);
+            const el = document.getElementById('bonus-countdown');
+            if (el) el.innerText = `Resets in ${h}h ${m}m ${s}s`;
+        }
+        tick();
+        bonusCountdown = setInterval(tick, 1000);
+    }
+
+    // ── ADEXIUM SETUP ────────────────────────────────────────
+    let adexiumAds = null;
+
+    function setupAdexium() {
+        adexiumAds = new AdexiumWidget({
+            wid: CONFIG.ADEXIUM_WID,
+            adFormat: 'interstitial',
+            firstAdImpressionIntervalInSeconds: 0,
+            adImpressionIntervalInSeconds: 0,
+            debug: false,
+            isFullScreen: true
+        });
+
+        adexiumAds.on('adReceived', (ad) => {
+            adexiumAds.displayAd(ad);
+        });
+
+        adexiumAds.on('noAdFound', () => {
+            showOverlay(false);
+            alert('❌ Ad not available right now. Try again later.');
+        });
+
+        adexiumAds.on('adClosed', () => {
+            showOverlay(false);
+            db.balance += CONFIG.ADEXIUM_VAL;
+            db.todayAdexium++;
+            db.lastAdexiumTime = Date.now();
+            db.totalAds++;
+            db.history.push({
+                date: new Date().toLocaleDateString('en-IN'),
+                amount: CONFIG.ADEXIUM_VAL,
+                currency: 'USDT',
+                method: '🟢 Adexium Ad',
+                timestamp: Date.now()
+            });
+            updateUI();
+            alert('✅ +$' + CONFIG.ADEXIUM_VAL + ' USDT Added!');
+        });
+
+        adexiumAds.on('adError', () => {
+            showOverlay(false);
+            alert('❌ Ad error. Please try again.');
+        });
+    }
+
+    function initAdexium() {
+        if (window.AdexiumWidget) {
+            setupAdexium();
+        } else {
+            const sc = document.createElement('script');
+            sc.src = 'https://cdn.techtg.space/assets/js/tg-ads-co-widget.min.js';
+            sc.onload = () => { if (window.AdexiumWidget) setupAdexium(); };
+            sc.onerror = () => console.warn('Adexium script failed');
+            document.head.appendChild(sc);
+        }
+    }
+
+    function runAdexium() {
+        if (db.todayAdexium >= CONFIG.ADEXIUM_DAILY_LIMIT) {
+            alert('Daily limit reached! Come back tomorrow.');
+            return;
+        }
+        if (!adexiumAds) {
+            alert('⏳ Ad system not ready. Please wait and try again.');
+            return;
+        }
+        showOverlay(true);
+        adexiumAds.requestAd('interstitial');
+    }
+
+    // ── DAILY BONUS ──────────────────────────────────────────
+    function claimDailyBonus() {
+        if (db.bonusLastClaim >= getISTMidnight()) {
+            alert('✅ Already claimed today! Come back tomorrow.');
+            return;
+        }
+        // Watch an Adexium ad to get bonus
+        if (!adexiumAds) {
+            alert('⏳ Ad system not ready. Please wait a moment.');
+            return;
+        }
+        showOverlay(true);
+        // Temporarily override adClosed for bonus
+        adexiumAds.off && adexiumAds.off('adClosed');
+        adexiumAds.on('adClosed', () => {
+            showOverlay(false);
+            grantBonus();
+            // Restore normal adClosed handler
+            adexiumAds.off && adexiumAds.off('adClosed');
+            adexiumAds.on('adClosed', () => {
+                showOverlay(false);
+                db.balance += CONFIG.ADEXIUM_VAL;
+                db.todayAdexium++;
+                db.totalAds++;
+                db.history.push({ date:new Date().toLocaleDateString('en-IN'), amount:CONFIG.ADEXIUM_VAL, currency:'USDT', method:'🟢 Adexium Ad', timestamp:Date.now() });
+                updateUI();
+                alert('✅ +$' + CONFIG.ADEXIUM_VAL + ' USDT Added!');
+            });
+        });
+        adexiumAds.requestAd('interstitial');
+    }
+
+    function grantBonus() {
+        const prevMidnight = getISTMidnight();
+        const prevDay = prevMidnight - 86400000;
+        const continues = db.bonusLastClaim >= prevDay && db.bonusLastClaim < prevMidnight;
+        db.bonusStreak = continues ? (db.bonusStreak||0)+1 : 1;
+        db.bonusLastClaim = Date.now();
+        db.balance += CONFIG.DAILY_BONUS_VAL;
+        db.history.push({
+            date: new Date().toLocaleDateString('en-IN'),
+            amount: CONFIG.DAILY_BONUS_VAL,
+            currency: 'USDT',
+            method: '🎁 Daily Bonus',
+            timestamp: Date.now(),
+            isBonus: true
+        });
+        updateUI();
+        alert(`🎁 Daily Bonus Claimed!\n+$${CONFIG.DAILY_BONUS_VAL} USDT Added!\n🔥 Streak: ${db.bonusStreak} Day${db.bonusStreak>1?'s':''}`);
+    }
+
+    // ── LOAD AD CARDS ────────────────────────────────────────
+    function loadAdCards() {
+        const adexiumLimitReached = db.todayAdexium >= CONFIG.ADEXIUM_DAILY_LIMIT;
+        const cardHTML = `
+        <div class="ad-card adexium-card">
+            <div class="ad-icon-wrap icon-green">
+                <i class="fa-solid fa-rectangle-ad"></i>
+            </div>
+            <div class="ad-info">
+                <span class="ad-badge badge-green">ADEXIUM</span>
+                <div class="ad-name">Video Ad</div>
+                <div class="ad-reward-val" style="color:var(--primary);">+$${CONFIG.ADEXIUM_VAL}</div>
+                <div class="ad-meta">${db.todayAdexium}/${CONFIG.ADEXIUM_DAILY_LIMIT} used today</div>
+            </div>
+            ${adexiumLimitReached
+                ? `<button class="btn-watch btn-disabled" disabled><i class="fa-solid fa-ban"></i> Done</button>`
+                : `<button class="btn-watch btn-green" onclick="runAdexium()"><i class="fa-solid fa-play"></i> Watch</button>`
+            }
+        </div>`;
+
+        const el1 = document.getElementById('ads-list');
+        const el2 = document.getElementById('ads-list-2');
+        if (el1) el1.innerHTML = cardHTML;
+        if (el2) el2.innerHTML = cardHTML;
+    }
+
+    // ── WITHDRAW ─────────────────────────────────────────────
+    let selectedMethod = null;
+
+    function selectMethod(name, min, cur, placeholder, reqAds) {
+        selectedMethod = { name, min, cur, reqAds };
+        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        const form = document.getElementById('withdraw-form');
+        form.style.display = 'block';
+        document.getElementById('p-info').placeholder = placeholder;
+        document.getElementById('p-amt').placeholder = `Amount (Min: ${min} ${cur})`;
+        const note = document.getElementById('req-note');
+        if (reqAds > 0) {
+            note.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Minimum ${reqAds} ads required`;
+            note.style.display = 'flex';
+        } else {
+            note.style.display = 'none';
+        }
+        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function selectCwallet() {
+        const now = Date.now();
+        const weekMs = 7*24*60*60*1000;
+        if (db.cwalletLastWithdraw && (now - db.cwalletLastWithdraw) < weekMs) {
+            const rem = weekMs - (now - db.cwalletLastWithdraw);
+            const d = Math.floor(rem/86400000), h = Math.floor((rem%86400000)/3600000), m = Math.floor((rem%3600000)/60000);
+            return alert(`⏳ Cwallet Weekly Limit!\nNext: ${d}d ${h}h ${m}m\n(Only $0.0001 per 7 days)`);
+        }
+        selectMethod('Cwallet', 0.0001, 'USDT', 'Enter Cwallet ID', 0);
+        event.currentTarget.classList.add('active');
+    }
+
+    function submitWithdraw() {
+        const info = document.getElementById('p-info').value.trim();
+        const amt  = parseFloat(document.getElementById('p-amt').value);
+        if (!info || !amt || !selectedMethod) return alert('Please fill all fields and select a method.');
+        if (db.bonusLastClaim < getISTMidnight()) return alert('⚠️ Claim your Daily Bonus first before withdrawing!');
+        if (selectedMethod.reqAds && db.totalAds < selectedMethod.reqAds) return alert(`Watch ${selectedMethod.reqAds} ads first.`);
+        if (amt < selectedMethod.min) return alert(`Minimum is ${selectedMethod.min} ${selectedMethod.cur}`);
+        if (amt > db.balance) return alert('Insufficient balance.');
+
+        if (selectedMethod.name === 'Cwallet') {
+            if (amt > 0.0001) return alert('Cwallet max: $0.0001 per week.');
+            db.cwalletLastWithdraw = Date.now();
+        }
+
+        db.balance -= amt;
+        const user = tg.initDataUnsafe.user;
+        const userId = user ? user.id : 'N/A';
+        const userName = user ? (user.first_name + (user.last_name ? ' '+user.last_name : '')) : 'N/A';
+        const userHandle = user && user.username ? '@'+user.username : 'N/A';
+
+        const msgText =
+`💸 *New Payout Request*
+
+👤 *User Info*
+• Name: ${userName}
+• Username: ${userHandle}  
+• User ID: \`${userId}\`
+
+💰 *Payment Details*
+• Amount: \`${amt} ${selectedMethod.cur}\`
+• Method: ${selectedMethod.name}
+• Wallet/Info: \`${info}\`
+
+📊 *Stats*
+• Total Ads: ${db.totalAds}
+• Balance After: \`$${db.balance.toFixed(4)} USDT\`
+
+🕐 ${new Date().toLocaleString('en-IN', {timeZone:'Asia/Kolkata'})} IST`;
+
+        if (CONFIG.BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE') {
+            fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ chat_id: CONFIG.ADMIN_ID, text: msgText, parse_mode:'Markdown' })
+            }).catch(() => {});
+        }
+
+        db.history.push({
+            date: new Date().toLocaleDateString('en-IN'),
+            amount: amt,
+            currency: selectedMethod.cur,
+            method: selectedMethod.name,
+            timestamp: Date.now()
+        });
+        updateUI();
+        alert('✅ Withdrawal Request Submitted!\nAdmin ko message ho gaya.\n24 hours mein process hoga.');
+        document.getElementById('withdraw-form').style.display = 'none';
+        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+        selectedMethod = null;
+    }
+
+    // ── HISTORY ──────────────────────────────────────────────
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        if (!db.history.length) {
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No transactions yet</p></div>`;
+            return;
+        }
+        const now = Date.now();
+        list.innerHTML = db.history.slice().reverse().map(h => {
+            const isPaid = h.isBonus ? true : (now - h.timestamp > 86400000);
+            return `<div class="history-item">
+                <div class="history-left">
+                    <div class="history-icon">${h.isBonus ? '🎁' : '💸'}</div>
+                    <div>
+                        <div class="history-amount">+${h.amount} <span style="font-size:11px;">${h.currency||'USDT'}</span></div>
+                        <div class="history-meta">${h.method} · ${h.date}</div>
+                    </div>
+                </div>
+                ${h.isBonus
+                    ? `<span class="status-badge status-success">✓ Bonus</span>`
+                    : isPaid
+                        ? `<span class="status-badge status-success">✓ Paid</span>`
+                        : `<span class="status-badge status-pending">⏳ Pending</span>`
+                }
+            </div>`;
+        }).join('');
+    }
+
+    // ── NAV ──────────────────────────────────────────────────
+    function switchTab(id, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id+'-view').classList.add('active');
+        el.classList.add('active');
+        if (id === 'history') renderHistory();
+    }
+
+    // ── INIT ─────────────────────────────────────────────────
+    window.onload = () => {
+        initAdexium();
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('greeting-user').innerText = user.first_name || 'User';
+        }
+        updateUI();
+    };
+</script>
+</body>
+</html>
